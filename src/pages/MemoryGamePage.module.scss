@@ -11,7 +11,7 @@
 .themeSwitcher {
   position: fixed;
   top: 14px;
-  left: 14px;
+  right: 14px;
   z-index: 50;
 }
 
@@ -43,8 +43,11 @@
 }
 
 .themeMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
   list-style: none;
-  margin: $spacing-xs 0 0;
+  margin: 0;
   padding: $spacing-xs;
   min-width: 240px;
   border: 1px solid var(--border);
@@ -55,9 +58,19 @@
   pointer-events: none;
   transform: translateY(-6px);
   transition: opacity $transition-fast, transform $transition-fast;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 0;
+    left: 0;
+    height: 10px;
+  }
 }
 
-.themeSwitcher:hover .themeMenu,
+.themeToggle:hover + .themeMenu,
+.themeMenu:hover,
 .themeSwitcher:focus-within .themeMenu {
   opacity: 1;
   pointer-events: auto;
@@ -180,6 +193,6 @@
 @media (max-width: 768px) {
   .themeSwitcher {
     top: 10px;
-    left: 10px;
+    right: 10px;
   }
 }
