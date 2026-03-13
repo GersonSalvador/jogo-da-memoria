@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test'
 
 test.describe('Jogo da Memória', () => {
-  test('deve iniciar partida após escolher dificuldade e tema', async ({ page }) => {
+  test('deve iniciar partida apos escolher dificuldade e alternar tema global', async ({ page }) => {
     await page.goto('/')
 
+    await expect(page.getByRole('button', { name: /alternar tema/i })).toBeVisible()
+    await page.getByRole('button', { name: /alternar tema/i }).click()
     await page.getByRole('combobox', { name: /dificuldade/i }).selectOption('medio')
-    await page.getByRole('combobox', { name: /tema/i }).selectOption('bottts')
     await page.getByRole('button', { name: /iniciar partida/i }).click()
 
     await expect(page.getByText(/tempo restante:/i)).toContainText('150')

@@ -1,8 +1,103 @@
 @use '../styles/tokens' as *;
+@use '../styles/mixins' as *;
 
 .memoryGame {
   margin: 0 auto;
   max-width: 920px;
   padding: $spacing-xl $spacing-md;
   text-align: center;
+}
+
+.themeSwitcher {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 50;
+}
+
+.themeToggle {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform $transition-fast, border-color $transition-fast, background-color $transition-fast;
+
+  @include focus-ring(var(--accent));
+
+  &:hover {
+    border-color: var(--accent-border);
+    background: var(--code-bg);
+    transform: translateY(-1px);
+  }
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.themeMenu {
+  list-style: none;
+  margin: $spacing-xs 0 0;
+  padding: $spacing-xs;
+  min-width: 170px;
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity $transition-fast, transform $transition-fast;
+}
+
+.themeSwitcher:hover .themeMenu,
+.themeSwitcher:focus-within .themeMenu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.themeOption {
+  width: 100%;
+  border: 0;
+  border-radius: $radius-sm;
+  background: transparent;
+  color: var(--text-h);
+  padding: 0.45rem 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+
+  @include focus-ring(var(--accent));
+
+  &:hover {
+    background: var(--accent-bg);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+  }
+}
+
+.themeOptionActive {
+  background: var(--accent-bg);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .themeSwitcher {
+    top: 10px;
+    left: 10px;
+  }
 }
