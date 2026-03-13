@@ -1,0 +1,18 @@
+@use '../../styles/tokens' as *;
+
+.resultPanel {
+  margin-top: $spacing-md;
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+
+  button {
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    padding: 0.65rem 0.75rem;
+    font: inherit;
+    cursor: pointer;
+    background: var(--accent-bg);
+    color: var(--text-h);
+  }
+}

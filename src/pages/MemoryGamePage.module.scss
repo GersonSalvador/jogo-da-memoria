@@ -1,0 +1,8 @@
+@use '../styles/tokens' as *;
+
+.memoryGame {
+  margin: 0 auto;
+  max-width: 920px;
+  padding: $spacing-xl $spacing-md;
+  text-align: center;
+}

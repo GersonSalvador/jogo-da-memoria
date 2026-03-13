@@ -1,0 +1,28 @@
+@use '../../styles/tokens' as *;
+
+.setupPanel {
+  margin: $spacing-lg auto 0;
+  max-width: 420px;
+  display: grid;
+  gap: $spacing-sm;
+  text-align: left;
+
+  label {
+    color: var(--text-h);
+    font-weight: 600;
+  }
+
+  select,
+  button {
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    padding: 0.65rem 0.75rem;
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: var(--accent-bg);
+    color: var(--text-h);
+  }
+}

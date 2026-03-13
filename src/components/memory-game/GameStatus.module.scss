@@ -1,0 +1,16 @@
+@use '../../styles/tokens' as *;
+
+.scoreboard {
+  margin: 0 auto $spacing-md;
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  p {
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    padding: 0.4rem 0.7rem;
+    color: var(--text-h);
+  }
+}
