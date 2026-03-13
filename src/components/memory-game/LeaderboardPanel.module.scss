@@ -1,0 +1,145 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.panel {
+  margin: $spacing-xl auto $spacing-xl;
+  max-width: 640px;
+  text-align: left;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: $spacing-md;
+  font-size: 1.15rem;
+  color: var(--text-h);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-xs;
+}
+
+.tab {
+  border: 1px solid transparent;
+  border-radius: $radius-sm $radius-sm 0 0;
+  background: transparent;
+  color: var(--text);
+  padding: 0.4rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+
+  @include focus-ring(var(--accent));
+
+  &:hover {
+    background: var(--accent-bg);
+    color: var(--text-h);
+  }
+}
+
+.tabActive {
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font-weight: 600;
+  border-color: var(--border);
+  border-bottom-color: var(--bg);
+}
+
+.tabPanel {
+  min-height: 120px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--text);
+  opacity: 0.6;
+  padding: $spacing-lg 0;
+  font-size: 0.9rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    padding: 0.45rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    color: var(--text-h);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.row:nth-child(odd) {
+  background: var(--accent-bg);
+}
+
+.position {
+  width: 2rem;
+  text-align: center;
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.playerName {
+  @include truncate(1);
+  max-width: 180px;
+}
+
+.score {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  width: 6rem;
+}
+
+.difficulty {
+  width: 5rem;
+}
+
+.date {
+  width: 5rem;
+  text-align: right;
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+@media (max-width: #{$breakpoint-sm}) {
+  .panel {
+    margin: $spacing-lg auto $spacing-lg;
+  }
+
+  .tabs {
+    gap: 2px;
+  }
+
+  .tab {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .table {
+    font-size: 0.82rem;
+  }
+
+  .playerName {
+    max-width: 110px;
+  }
+}

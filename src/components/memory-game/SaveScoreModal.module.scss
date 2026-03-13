@@ -1,0 +1,140 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: $spacing-md;
+  animation: fadeIn $transition-base both;
+}
+
+.dialog {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: $spacing-md;
+  animation: slideIn $transition-base both;
+}
+
+.title {
+  font-size: 1.25rem;
+  color: var(--text-h);
+  text-align: center;
+  margin: 0;
+}
+
+.scoreDisplay {
+  text-align: center;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+
+  strong {
+    color: var(--text-h);
+    font-size: 1.1rem;
+  }
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-h);
+  margin-bottom: $spacing-xs;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  background: var(--bg);
+  color: var(--text-h);
+  transition: border-color $transition-fast;
+  box-sizing: border-box;
+
+  @include focus-ring(var(--accent));
+
+  &:focus-visible {
+    border-color: var(--accent-border);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+  margin-top: $spacing-md;
+}
+
+.saveButton {
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font-weight: 600;
+  transition: opacity $transition-fast;
+
+  @include focus-ring(var(--accent));
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    border-color: var(--accent-border);
+  }
+}
+
+.skipButton {
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  transition: background $transition-fast;
+
+  @include focus-ring(var(--accent));
+
+  &:hover {
+    background: var(--accent-bg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

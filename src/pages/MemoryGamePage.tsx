@@ -2,6 +2,9 @@ import { GameBoard } from '../components/memory-game/GameBoard.tsx'
 import { GameResult } from '../components/memory-game/GameResult.tsx'
 import { GameSetup } from '../components/memory-game/GameSetup.tsx'
 import { GameStatus } from '../components/memory-game/GameStatus.tsx'
+import { LeaderboardPanel } from '../components/memory-game/LeaderboardPanel.tsx'
+import { SaveScoreModal } from '../components/memory-game/SaveScoreModal.tsx'
+import { useLeaderboard } from '../hooks/useLeaderboard.ts'
 import { useMemoryGame } from '../hooks/useMemoryGame.ts'
 import { type UiThemeKey } from '../services/gameConfig.ts'
 import styles from './MemoryGamePage.module.scss'
@@ -27,15 +30,42 @@ const ThemeIcon = ({ theme }: { theme: UiThemeKey }) => {
     case 'sepia':
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="4" width="14" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M8 8h8M8 11h8M8 14h6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <rect
+            x="5"
+            y="4"
+            width="14"
+            height="16"
+            rx="2"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M8 8h8M8 11h8M8 14h6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       )
     case 'oceano':
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 14c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M3 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path
+            d="M3 14c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <path
+            d="M3 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 3 2"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       )
     case 'claro':
@@ -43,7 +73,13 @@ const ThemeIcon = ({ theme }: { theme: UiThemeKey }) => {
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="4" fill="currentColor" />
-          <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path
+            d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       )
   }
@@ -62,16 +98,26 @@ export const MemoryGamePage = ({
     difficulty,
     phase,
     errors,
+    matchedPairs,
     remainingSeconds,
     score,
     isResolving,
+    showSaveModal,
     boardRows,
     difficultyOptions,
     setDifficulty,
     startGame,
     handleCardClick,
     handlePlayAgain,
+    closeSaveModal,
   } = useMemoryGame()
+
+  const { topOverall, lastPlayerName, saveEntry, getTopForDifficulty } = useLeaderboard()
+
+  const handleSaveScore = (playerName: string) => {
+    saveEntry({ playerName, score, difficulty, matchedPairs, errors, remainingSeconds })
+    closeSaveModal()
+  }
 
   return (
     <main className={styles.memoryGame}>
@@ -107,6 +153,10 @@ export const MemoryGamePage = ({
       </div>
       <h1>Jogo da Memória</h1>
 
+      {phase !== 'playing' && (
+        <LeaderboardPanel topOverall={topOverall} getTopForDifficulty={getTopForDifficulty} />
+      )}
+
       {phase === 'setup' ? (
         <GameSetup
           difficulty={difficulty}
@@ -125,6 +175,15 @@ export const MemoryGamePage = ({
           />
           <GameResult phase={phase} score={score} onPlayAgain={handlePlayAgain} />
         </>
+      )}
+
+      {showSaveModal && (
+        <SaveScoreModal
+          lastPlayerName={lastPlayerName}
+          score={score}
+          onSave={handleSaveScore}
+          onDismiss={closeSaveModal}
+        />
       )}
     </main>
   )

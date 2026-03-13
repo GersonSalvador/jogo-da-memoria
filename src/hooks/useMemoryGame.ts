@@ -15,6 +15,7 @@ type MemoryGameState = {
   remainingSeconds: number
   score: number
   isResolving: boolean
+  showSaveModal: boolean
 }
 
 type StartGamePayload = {
@@ -29,6 +30,7 @@ type MemoryGameAction =
   | { type: 'HIDE_MISMATCH' }
   | { type: 'TICK' }
   | { type: 'BACK_TO_SETUP' }
+  | { type: 'CLOSE_SAVE_MODAL' }
 
 const initialState: MemoryGameState = {
   difficulty: 'facil',
@@ -40,6 +42,7 @@ const initialState: MemoryGameState = {
   remainingSeconds: 0,
   score: 0,
   isResolving: false,
+  showSaveModal: false,
 }
 
 const calculateLiveScore = (matchedPairs: number, errors: number): number => {
@@ -137,6 +140,7 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
             matchedPairs: nextMatchedPairs,
             score: finalScore,
             phase: 'won',
+            showSaveModal: true,
           }
         }
 
@@ -207,6 +211,14 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
       return {
         ...state,
         phase: 'setup',
+        showSaveModal: false,
+      }
+    }
+
+    case 'CLOSE_SAVE_MODAL': {
+      return {
+        ...state,
+        showSaveModal: false,
       }
     }
 
@@ -290,18 +302,25 @@ export const useMemoryGame = () => {
     dispatch({ type: 'BACK_TO_SETUP' })
   }
 
+  const closeSaveModal = () => {
+    dispatch({ type: 'CLOSE_SAVE_MODAL' })
+  }
+
   return {
     difficulty: state.difficulty,
     phase: state.phase,
     errors: state.errors,
+    matchedPairs: state.matchedPairs,
     remainingSeconds: state.remainingSeconds,
     score: state.score,
     isResolving: state.isResolving,
+    showSaveModal: state.showSaveModal,
     boardRows,
     difficultyOptions,
     setDifficulty,
     startGame,
     handleCardClick,
     handlePlayAgain,
+    closeSaveModal,
   }
 }

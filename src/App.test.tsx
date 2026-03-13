@@ -139,7 +139,104 @@ describe('Jogo da Memória - integração de UI', () => {
       await user.click(cards[index + 1]!)
     }
 
+    expect(view.getByRole('dialog', { name: /você venceu/i })).toBeInTheDocument()
+    expect(view.getByLabelText(/seu nome/i)).toBeInTheDocument()
+  })
+
+  it('deve pré-preencher o campo de nome com o último nome salvo', async () => {
+    window.localStorage.setItem('memory-game.last-player-name', 'Fulano')
+
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    for (let index = 0; index < cards.length; index += 2) {
+      await user.click(cards[index]!)
+      await user.click(cards[index + 1]!)
+    }
+
+    expect(view.getByLabelText(/seu nome/i)).toHaveValue('Fulano')
+  })
+
+  it('botão salvar deve estar desabilitado quando nome está vazio', async () => {
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    for (let index = 0; index < cards.length; index += 2) {
+      await user.click(cards[index]!)
+      await user.click(cards[index + 1]!)
+    }
+
+    const nameInput = view.getByLabelText(/seu nome/i)
+    await user.clear(nameInput)
+
+    const saveButton = view.getByRole('button', { name: /salvar pontuação/i })
+    expect(saveButton).toBeDisabled()
+  })
+
+  it('deve salvar pontuação no ranking e fechar modal ao confirmar nome', async () => {
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    for (let index = 0; index < cards.length; index += 2) {
+      await user.click(cards[index]!)
+      await user.click(cards[index + 1]!)
+    }
+
+    const nameInput = view.getByLabelText(/seu nome/i)
+    await user.clear(nameInput)
+    await user.type(nameInput, 'Jogador Teste')
+    await user.click(view.getByRole('button', { name: /salvar pontuação/i }))
+
+    expect(view.queryByRole('dialog', { name: /você venceu/i })).not.toBeInTheDocument()
     expect(view.getByRole('heading', { name: /você venceu/i })).toBeInTheDocument()
-    expect(view.getByText(/pontuação final:/i)).toBeInTheDocument()
+    expect(view.getByText(/melhores pontuações/i)).toBeInTheDocument()
+    expect(window.localStorage.getItem('memory-game.last-player-name')).toBe('Jogador Teste')
+  })
+
+  it('deve fechar modal sem salvar ao clicar em Pular', async () => {
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    for (let index = 0; index < cards.length; index += 2) {
+      await user.click(cards[index]!)
+      await user.click(cards[index + 1]!)
+    }
+
+    await user.click(view.getByRole('button', { name: /pular/i }))
+    expect(view.queryByRole('dialog', { name: /você venceu/i })).not.toBeInTheDocument()
+    expect(window.localStorage.getItem('memory-game.last-player-name')).toBeNull()
+  })
+
+  it('deve exibir quadro de pontuações na tela inicial', () => {
+    const view = render(<App />)
+    expect(view.getByRole('region', { name: /melhores pontuações/i })).toBeInTheDocument()
+  })
+
+  it('deve ocultar quadro de pontuações durante a partida', async () => {
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    expect(view.getByRole('region', { name: /melhores pontuações/i })).toBeInTheDocument()
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    expect(view.queryByRole('region', { name: /melhores pontuações/i })).not.toBeInTheDocument()
   })
 })
