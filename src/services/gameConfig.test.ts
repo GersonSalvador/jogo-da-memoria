@@ -23,14 +23,14 @@ describe('Configuração do jogo', () => {
     expect(DIFFICULTIES.dificil.timeLimitSeconds).toBe(480)
 
     expect(DIFFICULTIES.extremo.rows).toBe(10)
-    expect(DIFFICULTIES.extremo.columns).toBe(10)
-    expect(DIFFICULTIES.extremo.totalCards).toBe(100)
-    expect(DIFFICULTIES.extremo.timeLimitSeconds).toBe(750)
+    expect(DIFFICULTIES.extremo.columns).toBe(6)
+    expect(DIFFICULTIES.extremo.totalCards).toBe(60)
+    expect(DIFFICULTIES.extremo.timeLimitSeconds).toBe(450)
   })
 
-  it('deve garantir grades quadradas e quantidade de cartas sempre par', () => {
+  it('deve manter quantidade de cartas coerente com a grade e sempre par', () => {
     for (const config of Object.values(DIFFICULTIES)) {
-      expect(config.rows).toBe(config.columns)
+      expect(config.totalCards).toBe(config.rows * config.columns)
       expect(config.totalCards % 2).toBe(0)
     }
   })
