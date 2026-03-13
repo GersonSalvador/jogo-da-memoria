@@ -16,19 +16,20 @@ export const GameSetup = ({
 }: GameSetupProps) => {
   return (
     <section className={styles.setupPanel} aria-label="Configuração da partida">
-      <label htmlFor="difficulty">Dificuldade</label>
-      <select
-        id="difficulty"
-        name="difficulty"
-        value={difficulty}
-        onChange={(event) => onDifficultyChange(event.target.value as DifficultyKey)}
-      >
+      <fieldset className={styles.difficultyGroup}>
+        <legend>Dificuldade</legend>
         {difficultyOptions.map((difficultyOption) => (
-          <option key={difficultyOption} value={difficultyOption}>
+          <button
+            key={difficultyOption}
+            type="button"
+            className={styles.difficultyButton}
+            aria-pressed={difficulty === difficultyOption}
+            onClick={() => onDifficultyChange(difficultyOption)}
+          >
             {DIFFICULTIES[difficultyOption].label}
-          </option>
+          </button>
         ))}
-      </select>
+      </fieldset>
 
       <button type="button" onClick={onStartGame}>
         Iniciar partida

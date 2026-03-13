@@ -7,12 +7,6 @@
   gap: $spacing-sm;
   text-align: left;
 
-  label {
-    color: var(--text-h);
-    font-weight: 600;
-  }
-
-  select,
   button {
     border: 1px solid var(--border);
     border-radius: $radius-md;
@@ -24,5 +18,34 @@
     cursor: pointer;
     background: var(--accent-bg);
     color: var(--text-h);
+  }
+}
+
+.difficultyGroup {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+
+  legend {
+    width: 100%;
+    color: var(--text-h);
+    font-weight: 600;
+    margin-bottom: $spacing-xs;
+  }
+}
+
+.difficultyButton {
+  cursor: pointer;
+  text-align: left;
+  background: var(--surface);
+  color: var(--text-h);
+  flex: 1 1 140px;
+
+  &[aria-pressed='true'] {
+    background: var(--accent-bg);
+    border-color: var(--accent);
   }
 }

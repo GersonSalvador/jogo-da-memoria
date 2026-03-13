@@ -12,7 +12,7 @@ test.describe('Jogo da Memória', () => {
     await page.getByRole('button', { name: /abrir configuracoes do jogador/i }).click()
     await page.getByRole('menuitemradio', { name: /escuro/i }).click()
     await page.getByRole('menuitemradio', { name: /pontos/i }).click()
-    await page.getByRole('combobox', { name: /dificuldade/i }).selectOption('medio')
+    await page.getByRole('button', { name: /médio/i }).click()
     await page.getByRole('button', { name: /iniciar partida/i }).click()
 
     await expect(page.getByText(/tempo restante:/i)).toContainText('270')
@@ -24,7 +24,7 @@ test.describe('Jogo da Memória', () => {
   test('deve exibir derrota quando o tempo acabar', async ({ page }) => {
     await page.goto('/')
 
-    await page.getByRole('combobox', { name: /dificuldade/i }).selectOption('facil')
+    await page.getByRole('button', { name: /fácil/i }).click()
     await page.getByRole('button', { name: /iniciar partida/i }).click()
 
     await page.waitForTimeout(121_000)
