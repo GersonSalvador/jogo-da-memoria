@@ -8,6 +8,11 @@
   text-align: center;
 }
 
+.playArea {
+  display: grid;
+  gap: $spacing-sm;
+}
+
 .themeSwitcher {
   position: fixed;
   top: 14px;
@@ -196,3 +201,5 @@
     right: 10px;
   }
 }
+
+

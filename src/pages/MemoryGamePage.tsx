@@ -1,3 +1,4 @@
+import { GameAnimation } from '../components/memory-game/GameAnimation.tsx'
 import { GameBoard } from '../components/memory-game/GameBoard.tsx'
 import { GameResult } from '../components/memory-game/GameResult.tsx'
 import { GameSetup } from '../components/memory-game/GameSetup.tsx'
@@ -114,6 +115,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
 
   return (
     <main className={styles.memoryGame}>
+      <GameAnimation phase={phase} />
       <div className={styles.themeSwitcher}>
         <button
           type="button"
@@ -187,7 +189,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
           onStartGame={startGame}
         />
       ) : (
-        <>
+        <div className={styles.playArea}>
           <GameStatus
             remainingSeconds={remainingSeconds}
             errors={errors}
@@ -203,7 +205,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
             onCardClick={handleCardClick}
           />
           <GameResult phase={phase} score={score} onPlayAgain={handlePlayAgain} />
-        </>
+        </div>
       )}
 
       {showSaveModal && (
