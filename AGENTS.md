@@ -4,8 +4,8 @@ Este arquivo define como os agentes colaboram neste projeto.
 
 ## Leitura obrigatória antes de qualquer tarefa
 
-> **Todo agente deve ler [`docs/PROJECT_GUIDELINES.md`](docs/PROJECT_GUIDELINES.md) antes de iniciar qualquer tarefa.**  
-> Esse documento concentra arquitetura, mapa de arquivos, runbook, padrões, testes, segurança e critérios de pronto — eliminando a necessidade de leitura completa do repositório a cada prompt.
+> **Todo agente deve ler [`docs/PROJECT_GUIDELINES_SHORT.md`](docs/PROJECT_GUIDELINES_SHORT.md) antes de iniciar qualquer tarefa.**  
+> O documento completo [`docs/PROJECT_GUIDELINES.md`](docs/PROJECT_GUIDELINES.md) deve ser consultado quando a tarefa exigir detalhes de arquitetura, runbook, testes, segurança, critérios de pronto ou convenções específicas.
 
 ## Agentes disponíveis
 - Arquiteto: [agents/arquiteto.md](agents/arquiteto.md)

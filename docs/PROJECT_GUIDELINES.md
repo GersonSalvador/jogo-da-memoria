@@ -1,5 +1,8 @@
 # Diretrizes do Projeto — Jogo da Memória
 
+> **Versão curta para uso no chat**: [`docs/PROJECT_GUIDELINES_SHORT.md`](./PROJECT_GUIDELINES_SHORT.md).
+> Use este documento completo quando a tarefa exigir detalhes.
+
 > **Leitura obrigatória antes de qualquer tarefa.** Este documento elimina a necessidade de leitura completa do repositório a cada prompt. Ele concentra arquitetura, padrões, comandos e critérios de qualidade que os agentes devem conhecer.
 
 ---
