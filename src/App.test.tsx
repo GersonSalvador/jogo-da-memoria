@@ -242,6 +242,27 @@ describe('Jogo da Memória - integração de UI', () => {
     expect(window.localStorage.getItem('memory-game.last-player-name')).toBeNull()
   })
 
+  it('deve permitir abandonar a partida sem considerar pontuação no ranking', async () => {
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    await user.click(cards[0]!)
+    await user.click(cards[2]!)
+
+    expect(view.getByText(/pontuação:/i)).toHaveTextContent('-15')
+
+    await user.click(view.getByRole('button', { name: /abandonar partida/i }))
+
+    expect(view.getByRole('combobox', { name: /dificuldade/i })).toBeInTheDocument()
+    expect(view.queryByText(/pontuação:/i)).not.toBeInTheDocument()
+    expect(window.localStorage.getItem('memory-game.last-player-name')).toBeNull()
+    expect(window.localStorage.getItem('memory-game.leaderboard')).toBeNull()
+  })
+
   it('deve exibir quadro de pontuações na tela inicial', () => {
     const view = render(<App />)
     expect(view.getByRole('region', { name: /melhores pontuações/i })).toBeInTheDocument()

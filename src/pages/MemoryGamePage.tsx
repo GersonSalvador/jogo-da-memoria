@@ -101,6 +101,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
     startGame,
     handleCardClick,
     handlePlayAgain,
+    abandonGame,
     closeSaveModal,
   } = useMemoryGame()
 
@@ -187,7 +188,12 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
         />
       ) : (
         <>
-          <GameStatus remainingSeconds={remainingSeconds} errors={errors} score={score} />
+          <GameStatus
+            remainingSeconds={remainingSeconds}
+            errors={errors}
+            score={score}
+            onAbandon={abandonGame}
+          />
           <GameBoard
             boardColumns={boardColumns}
             boardRows={boardRows}

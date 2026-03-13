@@ -14,3 +14,12 @@
     color: var(--text-h);
   }
 }
+
+.abandonButton {
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  padding: 0.4rem 0.7rem;
+  color: var(--text-h);
+  background: transparent;
+  cursor: pointer;
+}

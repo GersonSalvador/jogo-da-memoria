@@ -54,6 +54,7 @@ type MemoryGameAction =
   | { type: 'CARD_CLICK'; payload: string }
   | { type: 'HIDE_MISMATCH' }
   | { type: 'TICK' }
+  | { type: 'ABANDON_GAME' }
   | { type: 'BACK_TO_SETUP' }
   | { type: 'CLOSE_SAVE_MODAL' }
 
@@ -240,6 +241,25 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
       }
     }
 
+    case 'ABANDON_GAME': {
+      if (state.phase !== 'playing') {
+        return state
+      }
+
+      return {
+        ...state,
+        cards: [],
+        flippedCardIds: [],
+        errors: 0,
+        matchedPairs: 0,
+        remainingSeconds: 0,
+        score: 0,
+        isResolving: false,
+        showSaveModal: false,
+        phase: 'setup',
+      }
+    }
+
     case 'BACK_TO_SETUP': {
       return {
         ...state,
@@ -349,6 +369,10 @@ export const useMemoryGame = () => {
     dispatch({ type: 'BACK_TO_SETUP' })
   }
 
+  const abandonGame = () => {
+    dispatch({ type: 'ABANDON_GAME' })
+  }
+
   const closeSaveModal = () => {
     dispatch({ type: 'CLOSE_SAVE_MODAL' })
   }
@@ -372,6 +396,7 @@ export const useMemoryGame = () => {
     startGame,
     handleCardClick,
     handlePlayAgain,
+    abandonGame,
     closeSaveModal,
   }
 }
