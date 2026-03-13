@@ -11,8 +11,8 @@ test.describe('Jogo da Memória', () => {
     await page.getByRole('combobox', { name: /dificuldade/i }).selectOption('medio')
     await page.getByRole('button', { name: /iniciar partida/i }).click()
 
-    await expect(page.getByText(/tempo restante:/i)).toContainText('150')
-    await expect(page.getByRole('grid', { name: /tabuleiro de cartas/i })).toBeVisible()
+    await expect(page.getByText(/tempo restante:/i)).toContainText('270')
+    await expect(page.getByRole('region', { name: /tabuleiro de cartas/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /carta/i }).first()).toBeVisible()
   })
 

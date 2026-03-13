@@ -13,7 +13,6 @@ type MemoryGamePageProps = {
   uiTheme: UiThemeKey
   uiThemes: Record<UiThemeKey, { label: string; icon: string }>
   currentThemeLabel: string
-  nextTheme: UiThemeKey
   nextThemeLabel: string
   onCycleUiTheme: () => void
   onSelectUiTheme: (theme: UiThemeKey) => void
@@ -89,7 +88,6 @@ export const MemoryGamePage = ({
   uiTheme,
   uiThemes,
   currentThemeLabel,
-  nextTheme,
   nextThemeLabel,
   onCycleUiTheme,
   onSelectUiTheme,
@@ -103,6 +101,7 @@ export const MemoryGamePage = ({
     score,
     isResolving,
     showSaveModal,
+    boardColumns,
     boardRows,
     difficultyOptions,
     setDifficulty,
@@ -168,6 +167,7 @@ export const MemoryGamePage = ({
         <>
           <GameStatus remainingSeconds={remainingSeconds} errors={errors} score={score} />
           <GameBoard
+            boardColumns={boardColumns}
             boardRows={boardRows}
             phase={phase}
             isResolving={isResolving}

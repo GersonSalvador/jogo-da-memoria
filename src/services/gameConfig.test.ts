@@ -7,21 +7,30 @@ describe('Configuração do jogo', () => {
   })
 
   it('deve mapear quantidade de cartas e tempo por dificuldade', () => {
-    expect(DIFFICULTIES.facil.totalCards).toBe(8)
+    expect(DIFFICULTIES.facil.rows).toBe(4)
+    expect(DIFFICULTIES.facil.columns).toBe(4)
+    expect(DIFFICULTIES.facil.totalCards).toBe(16)
     expect(DIFFICULTIES.facil.timeLimitSeconds).toBe(120)
 
-    expect(DIFFICULTIES.medio.totalCards).toBe(12)
-    expect(DIFFICULTIES.medio.timeLimitSeconds).toBe(150)
+    expect(DIFFICULTIES.medio.rows).toBe(6)
+    expect(DIFFICULTIES.medio.columns).toBe(6)
+    expect(DIFFICULTIES.medio.totalCards).toBe(36)
+    expect(DIFFICULTIES.medio.timeLimitSeconds).toBe(270)
 
-    expect(DIFFICULTIES.dificil.totalCards).toBe(16)
-    expect(DIFFICULTIES.dificil.timeLimitSeconds).toBe(180)
+    expect(DIFFICULTIES.dificil.rows).toBe(8)
+    expect(DIFFICULTIES.dificil.columns).toBe(8)
+    expect(DIFFICULTIES.dificil.totalCards).toBe(64)
+    expect(DIFFICULTIES.dificil.timeLimitSeconds).toBe(480)
 
-    expect(DIFFICULTIES.extremo.totalCards).toBe(20)
-    expect(DIFFICULTIES.extremo.timeLimitSeconds).toBe(210)
+    expect(DIFFICULTIES.extremo.rows).toBe(10)
+    expect(DIFFICULTIES.extremo.columns).toBe(10)
+    expect(DIFFICULTIES.extremo.totalCards).toBe(100)
+    expect(DIFFICULTIES.extremo.timeLimitSeconds).toBe(750)
   })
 
-  it('deve garantir quantidade de cartas sempre par', () => {
+  it('deve garantir grades quadradas e quantidade de cartas sempre par', () => {
     for (const config of Object.values(DIFFICULTIES)) {
+      expect(config.rows).toBe(config.columns)
       expect(config.totalCards % 2).toBe(0)
     }
   })

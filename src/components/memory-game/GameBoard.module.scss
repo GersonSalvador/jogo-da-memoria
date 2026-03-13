@@ -7,6 +7,5 @@
 
 .row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: $spacing-sm;
 }

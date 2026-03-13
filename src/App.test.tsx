@@ -1,18 +1,18 @@
 import { act, fireEvent, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, vi } from 'vitest'
+import { DIFFICULTIES } from './services/gameConfig'
 import App from './App'
+import type { MemoryCard } from './services/memoryDeck.ts'
 
 vi.mock('./services/memoryDeck.ts', async () => {
-  const actual = await vi.importActual<typeof import('./services/memoryDeck.ts')>(
-    './services/memoryDeck.ts',
-  )
+  const actual = (await vi.importActual('./services/memoryDeck.ts')) as Record<string, unknown>
 
   return {
     ...actual,
     createDeck: ({ totalCards }: { totalCards: number }) => {
       const totalPairs = totalCards / 2
-      const deck: actual.MemoryCard[] = []
+      const deck: MemoryCard[] = []
 
       for (let pairId = 0; pairId < totalPairs; pairId += 1) {
         const face = `face-${pairId}`
@@ -80,14 +80,16 @@ describe('Jogo da Memória - integração de UI', () => {
     await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'medio')
     await user.click(view.getByRole('button', { name: /iniciar partida/i }))
 
-    expect(view.getByText(/tempo restante:/i)).toHaveTextContent('150')
+    expect(view.getByText(/tempo restante:/i)).toHaveTextContent(
+      String(DIFFICULTIES.medio.timeLimitSeconds),
+    )
     expect(view.getByText(/erros:/i)).toHaveTextContent('0')
     expect(view.getByText(/pontuação:/i)).toHaveTextContent('0')
 
-    const board = view.getByRole('grid', { name: /tabuleiro de cartas/i })
+    const board = view.getByRole('region', { name: /tabuleiro de cartas/i })
     expect(board).toBeInTheDocument()
     const cards = view.getAllByRole('button', { name: /carta/i })
-    expect(cards).toHaveLength(12)
+    expect(cards).toHaveLength(DIFFICULTIES.medio.totalCards)
   })
 
   it('deve atualizar erros e pontuação quando jogador erra um par', async () => {

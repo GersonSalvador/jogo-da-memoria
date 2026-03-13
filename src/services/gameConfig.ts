@@ -1,24 +1,27 @@
+const BASE_TIME_SECONDS = 120
+const BASE_TOTAL_CARDS = 16
+
+const calculateTimeLimitSeconds = (totalCards: number): number => {
+  return Math.round((BASE_TIME_SECONDS * totalCards) / BASE_TOTAL_CARDS)
+}
+
+const createSquareDifficulty = (label: string, size: number) => {
+  const totalCards = size * size
+
+  return {
+    label,
+    rows: size,
+    columns: size,
+    totalCards,
+    timeLimitSeconds: calculateTimeLimitSeconds(totalCards),
+  }
+}
+
 export const DIFFICULTIES = {
-  facil: {
-    label: 'Fácil',
-    totalCards: 8,
-    timeLimitSeconds: 120,
-  },
-  medio: {
-    label: 'Médio',
-    totalCards: 12,
-    timeLimitSeconds: 150,
-  },
-  dificil: {
-    label: 'Difícil',
-    totalCards: 16,
-    timeLimitSeconds: 180,
-  },
-  extremo: {
-    label: 'Extremo',
-    totalCards: 20,
-    timeLimitSeconds: 210,
-  },
+  facil: createSquareDifficulty('Fácil', 4),
+  medio: createSquareDifficulty('Médio', 6),
+  dificil: createSquareDifficulty('Difícil', 8),
+  extremo: createSquareDifficulty('Extremo', 10),
 } as const
 
 export const UI_THEMES = {

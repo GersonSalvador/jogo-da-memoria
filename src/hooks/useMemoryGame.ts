@@ -233,12 +233,13 @@ export const useMemoryGame = () => {
 
   const selectedDifficulty = useMemo(() => DIFFICULTIES[state.difficulty], [state.difficulty])
   const difficultyOptions = useMemo(() => Object.keys(DIFFICULTIES) as DifficultyKey[], [])
+  const boardColumns = selectedDifficulty.columns
   const boardRows = useMemo(() => {
     if (state.cards.length === 0) {
       return [] as MemoryCard[][]
     }
 
-    const rowSize = Math.ceil(Math.sqrt(state.cards.length))
+    const rowSize = boardColumns
     const rows: MemoryCard[][] = []
 
     for (let index = 0; index < state.cards.length; index += rowSize) {
@@ -246,7 +247,7 @@ export const useMemoryGame = () => {
     }
 
     return rows
-  }, [state.cards])
+  }, [boardColumns, state.cards])
 
   useEffect(() => {
     if (state.phase !== 'playing') {
@@ -315,6 +316,7 @@ export const useMemoryGame = () => {
     score: state.score,
     isResolving: state.isResolving,
     showSaveModal: state.showSaveModal,
+    boardColumns,
     boardRows,
     difficultyOptions,
     setDifficulty,

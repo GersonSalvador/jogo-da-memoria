@@ -9,7 +9,6 @@ const App = () => {
       uiTheme={uiTheme}
       uiThemes={uiThemes}
       currentThemeLabel={uiThemes[uiTheme].label}
-      nextTheme={nextTheme}
       nextThemeLabel={uiThemes[nextTheme].label}
       onCycleUiTheme={cycleUiTheme}
       onSelectUiTheme={selectUiTheme}
