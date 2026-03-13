@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DIFFICULTIES, THEMES } from './gameConfig'
+import { CARD_THEME, COLOR_THEMES, DIFFICULTIES } from './gameConfig'
 
 describe('Configuração do jogo', () => {
   it('deve expor 4 dificuldades pré-definidas', () => {
@@ -26,7 +26,11 @@ describe('Configuração do jogo', () => {
     }
   })
 
-  it('deve expor 3 temas fixos', () => {
-    expect(THEMES).toEqual(['avataaars', 'bottts', 'pixel-art'])
+  it('deve expor tema fixo de cartas como bottts', () => {
+    expect(CARD_THEME).toBe('bottts')
+  })
+
+  it('deve expor 5 temas de cor do layout', () => {
+    expect(Object.keys(COLOR_THEMES)).toEqual(['roxo', 'oceano', 'floresta', 'solar', 'rosa'])
   })
 })

@@ -1,4 +1,4 @@
-import type { ThemeKey } from './gameConfig'
+import { CARD_THEME } from './gameConfig'
 import { generateFace } from './dicebear'
 
 export type MemoryCard = {
@@ -11,7 +11,6 @@ export type MemoryCard = {
 
 type CreateDeckInput = {
   totalCards: number
-  theme: ThemeKey
 }
 
 const shuffleDeck = (cards: MemoryCard[]): MemoryCard[] => {
@@ -28,14 +27,13 @@ const shuffleDeck = (cards: MemoryCard[]): MemoryCard[] => {
   return shuffledCards
 }
 
-export const createDeck = ({ totalCards, theme }: CreateDeckInput): MemoryCard[] => {
+export const createDeck = ({ totalCards }: CreateDeckInput): MemoryCard[] => {
   const totalPairs = totalCards / 2
   const deck: MemoryCard[] = []
 
   for (let pairId = 0; pairId < totalPairs; pairId += 1) {
     const face = generateFace({
-      seed: `${theme}-${pairId}`,
-      theme,
+      seed: `${CARD_THEME}-${pairId}`,
     })
 
     deck.push({

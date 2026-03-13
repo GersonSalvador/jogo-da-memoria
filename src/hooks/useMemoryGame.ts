@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer } from 'react'
-import { DIFFICULTIES, type DifficultyKey, THEMES, type ThemeKey } from '../services/gameConfig.ts'
+import { COLOR_THEMES, DIFFICULTIES, type ColorThemeKey, type DifficultyKey } from '../services/gameConfig.ts'
 import { createDeck, type MemoryCard } from '../services/memoryDeck.ts'
 import { calculateScore } from '../services/scoring.ts'
 
@@ -7,7 +7,7 @@ export type GamePhase = 'setup' | 'playing' | 'won' | 'lost'
 
 type MemoryGameState = {
   difficulty: DifficultyKey
-  theme: ThemeKey
+  colorTheme: ColorThemeKey
   phase: GamePhase
   cards: MemoryCard[]
   flippedCardIds: string[]
@@ -25,7 +25,7 @@ type StartGamePayload = {
 
 type MemoryGameAction =
   | { type: 'SET_DIFFICULTY'; payload: DifficultyKey }
-  | { type: 'SET_THEME'; payload: ThemeKey }
+  | { type: 'SET_COLOR_THEME'; payload: ColorThemeKey }
   | { type: 'START_GAME'; payload: StartGamePayload }
   | { type: 'CARD_CLICK'; payload: string }
   | { type: 'HIDE_MISMATCH' }
@@ -34,7 +34,7 @@ type MemoryGameAction =
 
 const initialState: MemoryGameState = {
   difficulty: 'facil',
-  theme: 'avataaars',
+  colorTheme: 'roxo',
   phase: 'setup',
   cards: [],
   flippedCardIds: [],
@@ -66,14 +66,14 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
       }
     }
 
-    case 'SET_THEME': {
+    case 'SET_COLOR_THEME': {
       if (state.phase !== 'setup') {
         return state
       }
 
       return {
         ...state,
-        theme: action.payload,
+        colorTheme: action.payload,
       }
     }
 
@@ -251,6 +251,10 @@ export const useMemoryGame = () => {
   }, [state.cards])
 
   useEffect(() => {
+    document.documentElement.dataset.colorTheme = state.colorTheme
+  }, [state.colorTheme])
+
+  useEffect(() => {
     if (state.phase !== 'playing') {
       return
     }
@@ -282,14 +286,13 @@ export const useMemoryGame = () => {
     dispatch({ type: 'SET_DIFFICULTY', payload: nextDifficulty })
   }
 
-  const setTheme = (nextTheme: ThemeKey) => {
-    dispatch({ type: 'SET_THEME', payload: nextTheme })
+  const setColorTheme = (nextColorTheme: ColorThemeKey) => {
+    dispatch({ type: 'SET_COLOR_THEME', payload: nextColorTheme })
   }
 
   const startGame = () => {
     const cards = createDeck({
       totalCards: selectedDifficulty.totalCards,
-      theme: state.theme,
     })
 
     dispatch({
@@ -311,7 +314,7 @@ export const useMemoryGame = () => {
 
   return {
     difficulty: state.difficulty,
-    theme: state.theme,
+    colorTheme: state.colorTheme,
     phase: state.phase,
     errors: state.errors,
     remainingSeconds: state.remainingSeconds,
@@ -319,9 +322,9 @@ export const useMemoryGame = () => {
     isResolving: state.isResolving,
     boardRows,
     difficultyOptions,
-    themes: THEMES,
+    colorThemes: COLOR_THEMES,
     setDifficulty,
-    setTheme,
+    setColorTheme,
     startGame,
     handleCardClick,
     handlePlayAgain,

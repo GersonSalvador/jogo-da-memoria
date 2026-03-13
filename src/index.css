@@ -50,6 +50,37 @@
   }
 }
 
+/* ——— Temas de cor do layout ——— */
+[data-color-theme='roxo'] {
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+}
+
+[data-color-theme='oceano'] {
+  --accent: #3b82f6;
+  --accent-bg: rgba(59, 130, 246, 0.1);
+  --accent-border: rgba(59, 130, 246, 0.5);
+}
+
+[data-color-theme='floresta'] {
+  --accent: #22c55e;
+  --accent-bg: rgba(34, 197, 94, 0.1);
+  --accent-border: rgba(34, 197, 94, 0.5);
+}
+
+[data-color-theme='solar'] {
+  --accent: #f97316;
+  --accent-bg: rgba(249, 115, 22, 0.1);
+  --accent-border: rgba(249, 115, 22, 0.5);
+}
+
+[data-color-theme='rosa'] {
+  --accent: #ec4899;
+  --accent-bg: rgba(236, 72, 153, 0.1);
+  --accent-border: rgba(236, 72, 153, 0.5);
+}
+
 #root {
   width: 1126px;
   max-width: 100%;

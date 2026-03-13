@@ -6,25 +6,25 @@ describe('memoryDeck', () => {
     const randomSpy = vi.spyOn(Math, 'random')
     randomSpy.mockImplementation(() => 0)
 
-    const deck = createDeck({ totalCards: 8, theme: 'avataaars' })
+    const deck = createDeck({ totalCards: 8 })
 
     expect(deck).toHaveLength(8)
     expect(deck.map((card) => card.id)).toEqual([
+      '0-b',
       '1-a',
+      '1-b',
       '2-a',
+      '2-b',
       '3-a',
       '3-b',
-      '2-b',
       '0-a',
-      '0-b',
-      '1-b',
     ])
 
     randomSpy.mockRestore()
   })
 
   it('deve manter pares válidos após embaralhar', () => {
-    const deck = createDeck({ totalCards: 12, theme: 'bottts' })
+    const deck = createDeck({ totalCards: 12 })
 
     const pairCountMap = new Map<number, number>()
 

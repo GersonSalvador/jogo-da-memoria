@@ -8,7 +8,7 @@ import styles from './MemoryGamePage.module.scss'
 export const MemoryGamePage = () => {
   const {
     difficulty,
-    theme,
+    colorTheme,
     phase,
     errors,
     remainingSeconds,
@@ -16,9 +16,9 @@ export const MemoryGamePage = () => {
     isResolving,
     boardRows,
     difficultyOptions,
-    themes,
+    colorThemes,
     setDifficulty,
-    setTheme,
+    setColorTheme,
     startGame,
     handleCardClick,
     handlePlayAgain,
@@ -32,10 +32,10 @@ export const MemoryGamePage = () => {
         <GameSetup
           difficulty={difficulty}
           difficultyOptions={difficultyOptions}
-          theme={theme}
-          themes={themes}
+          colorTheme={colorTheme}
+          colorThemes={colorThemes}
           onDifficultyChange={setDifficulty}
-          onThemeChange={setTheme}
+          onColorThemeChange={setColorTheme}
           onStartGame={startGame}
         />
       ) : (
