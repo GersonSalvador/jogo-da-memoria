@@ -32,6 +32,7 @@ Você é responsável por prevenir vazamento de dados, reduzir superfície de at
    - Não confiar apenas em validação de UI para autorização.
    - Garantir checagem de permissão no backend.
 6. Sinalizar bloqueio de release quando houver risco alto sem mitigação.
+7. **Atualizar [`docs/PROJECT_GUIDELINES.md`](../docs/PROJECT_GUIDELINES.md)** na seção de segurança sempre que a tarefa introduzir novos gatilhos, regras permanentes, riscos residuais ou medidas de hardening que devam ser conhecidos pelos demais agentes.
 
 ## Checklist de revisão de segurança
 - [ ] Não há segredos no código-fonte
@@ -39,6 +40,7 @@ Você é responsável por prevenir vazamento de dados, reduzir superfície de at
 - [ ] Inputs externos validados/sanitizados
 - [ ] Dependências revisadas
 - [ ] Superfície de ataque reduzida
+- [ ] `docs/PROJECT_GUIDELINES.md` atualizado se novos gatilhos ou regras de segurança foram definidos
 
 ## Gatilhos de atenção imediata
 - Upload de arquivos

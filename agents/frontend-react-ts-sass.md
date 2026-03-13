@@ -27,6 +27,7 @@ Você é especialista em **React, TypeScript e SASS**, responsável por implemen
    - navegação por teclado.
 7. Otimizar render quando necessário (memoização com propósito, não por padrão).
 8. Seguir as práticas definidas em [guides/react-typescript-best-practices.md](../guides/react-typescript-best-practices.md).
+9. **Atualizar [`docs/PROJECT_GUIDELINES.md`](../docs/PROJECT_GUIDELINES.md)** nas seções afetadas (mapa de arquivos, convenções de código, sistema de estilos) sempre que a tarefa adicionar, remover ou renomear componentes, hooks, serviços ou padrões de estilo.
 
 ## Padrão de implementação
 - Definir contrato tipado do componente.
@@ -47,3 +48,4 @@ Você é especialista em **React, TypeScript e SASS**, responsável por implemen
 - [ ] SASS modular e consistente
 - [ ] Acessibilidade mínima atendida
 - [ ] Estado e side effects controlados
+- [ ] `docs/PROJECT_GUIDELINES.md` atualizado se arquitetura ou padrões de UI foram alterados

@@ -8,7 +8,7 @@ Gere mensagens de commit seguindo estas regras.
 - Tipos permitidos: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`, `style`, `revert`.
 
 ## Regras do resumo (linha de título)
-- Escreva em português (pt-BR).
+- **OBRIGATÓRIO: escreva SEMPRE em português do Brasil (pt-BR)**, sem exceção — inglês ou qualquer outro idioma é proibido.
 - Use verbo no imperativo (ex.: "adiciona", "corrige", "remove", "refatora").
 - Seja específico e curto (máximo ~72 caracteres).
 - Não termine com ponto final.

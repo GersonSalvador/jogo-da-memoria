@@ -2,6 +2,11 @@
 
 Este arquivo define como os agentes colaboram neste projeto.
 
+## Leitura obrigatória antes de qualquer tarefa
+
+> **Todo agente deve ler [`docs/PROJECT_GUIDELINES.md`](docs/PROJECT_GUIDELINES.md) antes de iniciar qualquer tarefa.**  
+> Esse documento concentra arquitetura, mapa de arquivos, runbook, padrões, testes, segurança e critérios de pronto — eliminando a necessidade de leitura completa do repositório a cada prompt.
+
 ## Agentes disponíveis
 - Arquiteto: [agents/arquiteto.md](agents/arquiteto.md)
 - Front-end (React + TypeScript + SASS): [agents/frontend-react-ts-sass.md](agents/frontend-react-ts-sass.md)
@@ -37,7 +42,9 @@ Cada agente deve devolver:
 - Código implementado com tipagem e legibilidade.
 - Testes adequados ao risco (ou justificativa explícita da ausência).
 - Revisão de segurança aplicada em cenários sensíveis.
+- Arquivos de [`docs/`](docs/) atualizados se a tarefa alterou arquitetura, padrões, runbook, testes ou segurança.
 - Resultado final consolidado pelo Arquiteto.
+- **Commits escritos em português do Brasil** (pt-BR) seguindo Conventional Commits — ver [`docs/PROJECT_GUIDELINES.md#10-convenções-de-commit`](docs/PROJECT_GUIDELINES.md#10-convenções-de-commit).
 
 ## Regras de decisão
 - Em conflito entre velocidade e segurança, priorizar segurança.

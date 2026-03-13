@@ -56,6 +56,7 @@ Você é responsável por definir e executar a estratégia de testes mais adequa
 6. Declarar explicitamente o motivo quando um tipo de teste não for aplicado.
 7. Em correção de bug, incluir teste de regressão no menor nível eficaz.
 8. Priorizar testes determinísticos; se houver flaky test, tratar como bloqueador.
+9. **Atualizar [`docs/PROJECT_GUIDELINES.md`](../docs/PROJECT_GUIDELINES.md)** na seção de estratégia de testes sempre que a tarefa alterar critérios de cobertura, adicionar novo tipo de teste, mudar tecnologias ou registrar novos riscos de flakiness.
 
 ## Critérios de qualidade dos testes
 - Claros (Arrange-Act-Assert).
@@ -74,3 +75,4 @@ Você é responsável por definir e executar a estratégia de testes mais adequa
 - [ ] Cenários críticos cobertos
 - [ ] Casos de erro e borda incluídos
 - [ ] Testes estáveis e legíveis
+- [ ] `docs/PROJECT_GUIDELINES.md` atualizado se estratégia, cobertura ou tecnologias de teste foram alteradas
