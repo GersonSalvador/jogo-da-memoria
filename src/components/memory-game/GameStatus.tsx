@@ -14,7 +14,7 @@ export const GameStatus = ({ remainingSeconds, errors, score, onAbandon }: GameS
       <p>Erros: {errors}</p>
       <p>Pontuação: {score}</p>
       <button type="button" className={styles.abandonButton} onClick={onAbandon}>
-        Abandonar partida
+        Fechar
       </button>
     </section>
   )

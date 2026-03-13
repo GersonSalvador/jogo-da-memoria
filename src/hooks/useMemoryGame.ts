@@ -242,10 +242,6 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
     }
 
     case 'ABANDON_GAME': {
-      if (state.phase !== 'playing') {
-        return state
-      }
-
       return {
         ...state,
         cards: [],
