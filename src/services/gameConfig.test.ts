@@ -18,9 +18,9 @@ describe('Configuração do jogo', () => {
     expect(DIFFICULTIES.medio.timeLimitSeconds).toBe(270)
 
     expect(DIFFICULTIES.dificil.rows).toBe(8)
-    expect(DIFFICULTIES.dificil.columns).toBe(8)
-    expect(DIFFICULTIES.dificil.totalCards).toBe(64)
-    expect(DIFFICULTIES.dificil.timeLimitSeconds).toBe(480)
+    expect(DIFFICULTIES.dificil.columns).toBe(6)
+    expect(DIFFICULTIES.dificil.totalCards).toBe(48)
+    expect(DIFFICULTIES.dificil.timeLimitSeconds).toBe(360)
 
     expect(DIFFICULTIES.extremo.rows).toBe(10)
     expect(DIFFICULTIES.extremo.columns).toBe(6)

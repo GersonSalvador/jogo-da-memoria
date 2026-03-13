@@ -20,7 +20,7 @@ const createDifficulty = (label: string, rows: number, columns: number) => {
 export const DIFFICULTIES = {
   facil: createDifficulty('Fácil', 4, 4),
   medio: createDifficulty('Médio', 6, 6),
-  dificil: createDifficulty('Difícil', 8, 8),
+  dificil: createDifficulty('Difícil', 8, 6),
   extremo: createDifficulty('Extremo', 10, 6),
 } as const
 
