@@ -1,73 +1,171 @@
-# React + TypeScript + Vite
+# Jogo da Memória
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SPA de jogo da memória desenvolvida com React, TypeScript, Vite e SASS Modules. O projeto oferece partidas com múltiplos níveis de dificuldade, cronômetro, sistema de pontuação, ranking persistido no navegador e personalização visual do tabuleiro.
 
-Currently, two official plugins are available:
+## Visão geral
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+O fluxo do jogo é dividido em três momentos:
 
-## React Compiler
+- configuração da partida
+- jogo em andamento
+- resultado de vitória ou derrota
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Antes de iniciar, o jogador escolhe a dificuldade. Durante a partida, o cronômetro corre em tempo real, erros contam como penalidade e a pontuação é atualizada conforme os pares corretos são encontrados. Ao vencer, é possível salvar o resultado no ranking local.
 
-## Expanding the ESLint configuration
+## Funcionalidades
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- quatro dificuldades com tabuleiros e tempos diferentes: Fácil, Médio, Difícil e Extremo
+- cronômetro regressivo com derrota automática quando o tempo chega a zero
+- cálculo de pontuação baseado em pares encontrados, tempo restante e penalidade por erro
+- ranking local com top 10 geral e top 10 por dificuldade
+- persistência em localStorage do ranking, último nome usado, tema visual e padrão do verso das cartas
+- seleção de tema visual da interface: Claro, Escuro, Sepia e Oceano
+- seleção do padrão do verso das cartas: Clássico, Listras diagonais, Pontos, Ondas suaves e Grade geométrica
+- cartas geradas com avatares via DiceBear no tema bottts
+- foco em acessibilidade com navegação por teclado, semântica e estados visuais claros
+- cobertura por testes unitários, integração e E2E
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Regras do jogo
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- o jogo começa na tela de configuração
+- ao iniciar uma partida, o baralho é embaralhado conforme a dificuldade selecionada
+- o jogador pode revelar até duas cartas por vez
+- quando duas cartas não combinam, elas são ocultadas novamente após 500 ms
+- quando todas as duplas são encontradas, a partida termina com vitória
+- quando o tempo acaba, a partida termina com derrota
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Dificuldades
+
+| Dificuldade | Grade | Total de cartas | Tempo |
+| --- | --- | --- | --- |
+| Fácil | 4 x 4 | 16 | 120 s |
+| Médio | 6 x 6 | 36 | 270 s |
+| Difícil | 8 x 6 | 48 | 360 s |
+| Extremo | 10 x 6 | 60 | 450 s |
+
+### Fórmula de pontuação
+
+```text
+pontuação = (pares_encontrados × 100) + (tempo_restante × 10) - (erros × 15)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Stack técnica
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- React 19
+- TypeScript 5
+- Vite 8
+- SASS Modules
+- ESLint 9
+- Vitest + Testing Library
+- Playwright
+- Docker + Nginx
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Estrutura principal
+
+```text
+src/
+  components/memory-game/   Componentes visuais do jogo
+  hooks/                    Estado do jogo, ranking e tema visual
+  pages/                    Composição da tela principal
+  services/                 Regras de negócio, pontuação e geração do baralho
+  styles/                   Tokens, variáveis e estilos globais
+  types/                    Tipos compartilhados
+tests/e2e/                  Testes end-to-end
+docs/                       Diretrizes e documentação de engenharia
 ```
+
+## Requisitos
+
+- Node.js 20.19 ou superior
+- npm 10 ou superior
+
+## Como rodar localmente
+
+```bash
+npm ci
+npm run dev
+```
+
+Aplicação disponível em:
+
+```text
+http://localhost:5173
+```
+
+## Como rodar com Docker
+
+Ambiente de desenvolvimento:
+
+```bash
+docker compose up --build
+```
+
+Aplicação disponível em:
+
+```text
+http://localhost:5173
+```
+
+Build de produção com Nginx:
+
+```bash
+docker build -t jogo-da-memoria .
+docker run --rm -p 8080:80 jogo-da-memoria
+```
+
+Aplicação disponível em:
+
+```text
+http://localhost:8080
+```
+
+## Scripts
+
+| Script | Descrição |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento com Vite |
+| `npm run build` | Gera o build de produção |
+| `npm run preview` | Publica localmente o build gerado |
+| `npm run lint` | Executa o lint do projeto |
+| `npm run lint:fix` | Corrige problemas autoajustáveis de lint |
+| `npm run test` | Executa os testes unitários e de integração |
+| `npm run test:watch` | Executa os testes em modo observação |
+| `npm run test:coverage` | Gera cobertura de testes |
+| `npm run test:e2e` | Executa os testes end-to-end com Playwright |
+
+## Persistência local
+
+Os seguintes dados são persistidos no navegador:
+
+- ranking geral e por dificuldade
+- último nome informado ao salvar pontuação
+- tema visual selecionado
+- padrão do verso das cartas
+
+## Qualidade e validação
+
+Os checks mínimos previstos para o projeto são:
+
+```bash
+npm run lint
+npm run build
+npm run test:coverage
+npm run test:e2e
+```
+
+Observações do ambiente atual:
+
+- Vite 8 exige Node.js 20.19 ou superior
+- em ambientes com permissões incorretas no diretório dist, o build pode exigir ajuste de ownership antes da execução
+
+## Testes implementados
+
+- testes unitários para configuração do jogo, baralho, pontuação e ranking
+- teste de integração da aplicação principal
+- testes E2E cobrindo início de partida, configuração do jogador e derrota por tempo esgotado
+
+## Próximos pontos naturais de evolução
+
+- adicionar placar remoto opcional
+- incluir animações e efeitos sonoros configuráveis
+- ampliar métricas de desempenho por partida
