@@ -47,27 +47,31 @@ describe('Jogo da Memória - integração de UI', () => {
     vi.useRealTimers()
   })
 
-  it('deve renderizar tela inicial com dificuldade e botao de tema global', () => {
+  it('deve renderizar tela inicial com dificuldade e menu de configuracoes do jogador', () => {
     const view = render(<App />)
 
     expect(view.getByRole('heading', { name: /jogo da memória/i })).toBeInTheDocument()
     expect(view.getByRole('combobox', { name: /dificuldade/i })).toBeInTheDocument()
-    expect(view.getByRole('button', { name: /alternar tema/i })).toBeInTheDocument()
+    expect(view.queryByRole('combobox', { name: /padrao do verso/i })).not.toBeInTheDocument()
+    expect(
+      view.getByRole('button', { name: /abrir configuracoes do jogador/i }),
+    ).toBeInTheDocument()
     expect(view.getByRole('button', { name: /iniciar partida/i })).toBeInTheDocument()
   })
 
-  it('deve alternar tema global e persistir no localStorage', async () => {
+  it('deve alternar tema pelo menu de configuracoes e persistir no localStorage', async () => {
     const user = userEvent.setup()
     const view = render(<App />)
 
-    const toggleThemeButton = view.getByRole('button', { name: /alternar tema/i })
+    const settingsButton = view.getByRole('button', { name: /abrir configuracoes do jogador/i })
 
     expect(document.documentElement.dataset.uiTheme).toBe('claro')
 
-    await user.click(toggleThemeButton)
+    await user.click(settingsButton)
+    await user.click(view.getByRole('menuitemradio', { name: /escuro/i }))
     expect(document.documentElement.dataset.uiTheme).toBe('escuro')
 
-    await user.click(toggleThemeButton)
+    await user.click(view.getByRole('menuitemradio', { name: /sepia/i }))
     expect(document.documentElement.dataset.uiTheme).toBe('sepia')
 
     expect(window.localStorage.getItem('memory-game.ui-theme')).toBe('sepia')
@@ -77,6 +81,8 @@ describe('Jogo da Memória - integração de UI', () => {
     const user = userEvent.setup()
     const view = render(<App />)
 
+    await user.click(view.getByRole('button', { name: /abrir configuracoes do jogador/i }))
+    await user.click(view.getByRole('menuitemradio', { name: /pontos/i }))
     await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'medio')
     await user.click(view.getByRole('button', { name: /iniciar partida/i }))
 
@@ -90,6 +96,17 @@ describe('Jogo da Memória - integração de UI', () => {
     expect(board).toBeInTheDocument()
     const cards = view.getAllByRole('button', { name: /carta/i })
     expect(cards).toHaveLength(DIFFICULTIES.medio.totalCards)
+    expect(view.container.querySelector('[data-card-pattern="pontos"]')).toBeInTheDocument()
+  })
+
+  it('deve iniciar com listras como padrao de verso do jogador', async () => {
+    const user = userEvent.setup()
+    const view = render(<App />)
+
+    await user.selectOptions(view.getByRole('combobox', { name: /dificuldade/i }), 'facil')
+    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    expect(view.container.querySelector('[data-card-pattern="listras"]')).toBeInTheDocument()
   })
 
   it('deve atualizar erros e pontuação quando jogador erra um par', async () => {

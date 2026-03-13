@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useReducer } from 'react'
-import { DIFFICULTIES, type DifficultyKey } from '../services/gameConfig.ts'
+import {
+  CARD_PATTERNS,
+  DIFFICULTIES,
+  type CardPatternKey,
+  type DifficultyKey,
+} from '../services/gameConfig.ts'
 import { createDeck, type MemoryCard } from '../services/memoryDeck.ts'
 import { calculateScore } from '../services/scoring.ts'
 
@@ -7,6 +12,7 @@ export type GamePhase = 'setup' | 'playing' | 'won' | 'lost'
 
 type MemoryGameState = {
   difficulty: DifficultyKey
+  cardPattern: CardPatternKey
   phase: GamePhase
   cards: MemoryCard[]
   flippedCardIds: string[]
@@ -23,8 +29,27 @@ type StartGamePayload = {
   timeLimitSeconds: number
 }
 
+const CARD_PATTERN_STORAGE_KEY = 'memory-game.card-pattern'
+
+const getInitialCardPattern = (): CardPatternKey => {
+  if (typeof window === 'undefined') {
+    return 'classico'
+  }
+
+  const storedPattern = window.localStorage.getItem(
+    CARD_PATTERN_STORAGE_KEY,
+  ) as CardPatternKey | null
+
+  if (storedPattern && storedPattern in CARD_PATTERNS) {
+    return storedPattern
+  }
+
+  return 'classico'
+}
+
 type MemoryGameAction =
   | { type: 'SET_DIFFICULTY'; payload: DifficultyKey }
+  | { type: 'SET_CARD_PATTERN'; payload: CardPatternKey }
   | { type: 'START_GAME'; payload: StartGamePayload }
   | { type: 'CARD_CLICK'; payload: string }
   | { type: 'HIDE_MISMATCH' }
@@ -34,6 +59,7 @@ type MemoryGameAction =
 
 const initialState: MemoryGameState = {
   difficulty: 'facil',
+  cardPattern: getInitialCardPattern(),
   phase: 'setup',
   cards: [],
   flippedCardIds: [],
@@ -63,6 +89,13 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
       return {
         ...state,
         difficulty: action.payload,
+      }
+    }
+
+    case 'SET_CARD_PATTERN': {
+      return {
+        ...state,
+        cardPattern: action.payload,
       }
     }
 
@@ -233,6 +266,7 @@ export const useMemoryGame = () => {
 
   const selectedDifficulty = useMemo(() => DIFFICULTIES[state.difficulty], [state.difficulty])
   const difficultyOptions = useMemo(() => Object.keys(DIFFICULTIES) as DifficultyKey[], [])
+  const cardPatternOptions = useMemo(() => Object.keys(CARD_PATTERNS) as CardPatternKey[], [])
   const boardColumns = selectedDifficulty.columns
   const boardRows = useMemo(() => {
     if (state.cards.length === 0) {
@@ -277,8 +311,20 @@ export const useMemoryGame = () => {
     }
   }, [state.isResolving])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.localStorage.setItem(CARD_PATTERN_STORAGE_KEY, state.cardPattern)
+  }, [state.cardPattern])
+
   const setDifficulty = (nextDifficulty: DifficultyKey) => {
     dispatch({ type: 'SET_DIFFICULTY', payload: nextDifficulty })
+  }
+
+  const setCardPattern = (nextPattern: CardPatternKey) => {
+    dispatch({ type: 'SET_CARD_PATTERN', payload: nextPattern })
   }
 
   const startGame = () => {
@@ -309,6 +355,7 @@ export const useMemoryGame = () => {
 
   return {
     difficulty: state.difficulty,
+    cardPattern: state.cardPattern,
     phase: state.phase,
     errors: state.errors,
     matchedPairs: state.matchedPairs,
@@ -319,7 +366,9 @@ export const useMemoryGame = () => {
     boardColumns,
     boardRows,
     difficultyOptions,
+    cardPatternOptions,
     setDifficulty,
+    setCardPattern,
     startGame,
     handleCardClick,
     handlePlayAgain,

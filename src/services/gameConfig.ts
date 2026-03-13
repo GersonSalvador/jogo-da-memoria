@@ -43,8 +43,27 @@ export const UI_THEMES = {
   },
 } as const
 
+export const CARD_PATTERNS = {
+  classico: {
+    label: 'Clássico',
+  },
+  listras: {
+    label: 'Listras diagonais',
+  },
+  pontos: {
+    label: 'Pontos',
+  },
+  ondas: {
+    label: 'Ondas suaves',
+  },
+  grade: {
+    label: 'Grade geometrica',
+  },
+} as const
+
 /** Estilo fixo das cartas — Bots (bottts do DiceBear) */
 export const CARD_THEME = 'bottts' as const
 
 export type DifficultyKey = keyof typeof DIFFICULTIES
 export type UiThemeKey = keyof typeof UI_THEMES
+export type CardPatternKey = keyof typeof CARD_PATTERNS

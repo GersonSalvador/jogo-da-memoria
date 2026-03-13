@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CARD_THEME, DIFFICULTIES, UI_THEMES } from './gameConfig'
+import { CARD_PATTERNS, CARD_THEME, DIFFICULTIES, UI_THEMES } from './gameConfig'
 
 describe('Configuração do jogo', () => {
   it('deve expor 4 dificuldades pré-definidas', () => {
@@ -41,5 +41,9 @@ describe('Configuração do jogo', () => {
 
   it('deve expor 4 temas visuais do layout', () => {
     expect(Object.keys(UI_THEMES)).toEqual(['claro', 'escuro', 'sepia', 'oceano'])
+  })
+
+  it('deve expor 5 padroes para o verso das cartas', () => {
+    expect(Object.keys(CARD_PATTERNS)).toEqual(['classico', 'listras', 'pontos', 'ondas', 'grade'])
   })
 })

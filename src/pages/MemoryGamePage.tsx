@@ -6,15 +6,12 @@ import { LeaderboardPanel } from '../components/memory-game/LeaderboardPanel.tsx
 import { SaveScoreModal } from '../components/memory-game/SaveScoreModal.tsx'
 import { useLeaderboard } from '../hooks/useLeaderboard.ts'
 import { useMemoryGame } from '../hooks/useMemoryGame.ts'
-import { type UiThemeKey } from '../services/gameConfig.ts'
+import { CARD_PATTERNS, type UiThemeKey } from '../services/gameConfig.ts'
 import styles from './MemoryGamePage.module.scss'
 
 type MemoryGamePageProps = {
   uiTheme: UiThemeKey
   uiThemes: Record<UiThemeKey, { label: string; icon: string }>
-  currentThemeLabel: string
-  nextThemeLabel: string
-  onCycleUiTheme: () => void
   onSelectUiTheme: (theme: UiThemeKey) => void
 }
 
@@ -84,16 +81,10 @@ const ThemeIcon = ({ theme }: { theme: UiThemeKey }) => {
   }
 }
 
-export const MemoryGamePage = ({
-  uiTheme,
-  uiThemes,
-  currentThemeLabel,
-  nextThemeLabel,
-  onCycleUiTheme,
-  onSelectUiTheme,
-}: MemoryGamePageProps) => {
+export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGamePageProps) => {
   const {
     difficulty,
+    cardPattern,
     phase,
     errors,
     matchedPairs,
@@ -104,7 +95,9 @@ export const MemoryGamePage = ({
     boardColumns,
     boardRows,
     difficultyOptions,
+    cardPatternOptions,
     setDifficulty,
+    setCardPattern,
     startGame,
     handleCardClick,
     handlePlayAgain,
@@ -124,31 +117,60 @@ export const MemoryGamePage = ({
         <button
           type="button"
           className={styles.themeToggle}
-          onClick={onCycleUiTheme}
           aria-haspopup="menu"
-          aria-label={`Alternar tema. Proximo: ${nextThemeLabel}`}
-          title={`Tema atual: ${currentThemeLabel}. Proximo: ${nextThemeLabel}`}
+          aria-label="Abrir configuracoes do jogador"
+          title="Configuracoes do jogador"
         >
-          <ThemeIcon theme={uiTheme} />
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M19.4 13a7.8 7.8 0 000-2l2-1.5-2-3.4-2.4 1a7.7 7.7 0 00-1.7-1L15 3h-6l-.3 3.1a7.7 7.7 0 00-1.7 1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 000 2l-2 1.5 2 3.4 2.4-1a7.7 7.7 0 001.7 1L9 21h6l.3-3.1a7.7 7.7 0 001.7-1l2.4 1 2-3.4-2-1.5zM12 15.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4z"
+              fill="currentColor"
+            />
+          </svg>
         </button>
-        <ul className={styles.themeMenu} role="menu" aria-label="Temas visuais">
-          {(Object.entries(uiThemes) as [UiThemeKey, { label: string; icon: string }][]).map(
-            ([themeKey, { label }]) => (
-              <li key={themeKey} role="none">
+        <div className={styles.themeMenu} role="menu" aria-label="Configuracoes do jogador">
+          <p className={styles.menuTitle}>Tema visual</p>
+          <ul className={styles.menuList}>
+            {(Object.entries(uiThemes) as [UiThemeKey, { label: string; icon: string }][]).map(
+              ([themeKey, { label }]) => (
+                <li key={themeKey}>
+                  <button
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={uiTheme === themeKey}
+                    className={`${styles.themeOption} ${uiTheme === themeKey ? styles.themeOptionActive : ''}`}
+                    onClick={() => onSelectUiTheme(themeKey)}
+                  >
+                    <ThemeIcon theme={themeKey} />
+                    <span>{label}</span>
+                  </button>
+                </li>
+              ),
+            )}
+          </ul>
+
+          <p className={styles.menuTitle}>Verso da carta</p>
+          <ul className={styles.menuList}>
+            {cardPatternOptions.map((patternOption) => (
+              <li key={patternOption}>
                 <button
                   type="button"
                   role="menuitemradio"
-                  aria-checked={uiTheme === themeKey}
-                  className={`${styles.themeOption} ${uiTheme === themeKey ? styles.themeOptionActive : ''}`}
-                  onClick={() => onSelectUiTheme(themeKey)}
+                  aria-checked={cardPattern === patternOption}
+                  className={`${styles.themeOption} ${cardPattern === patternOption ? styles.themeOptionActive : ''}`}
+                  onClick={() => setCardPattern(patternOption)}
                 >
-                  <ThemeIcon theme={themeKey} />
-                  <span>{label}</span>
+                  <span
+                    className={styles.patternSwatch}
+                    data-card-pattern={patternOption}
+                    aria-hidden="true"
+                  />
+                  <span>{CARD_PATTERNS[patternOption].label}</span>
                 </button>
               </li>
-            ),
-          )}
-        </ul>
+            ))}
+          </ul>
+        </div>
       </div>
       <h1>Jogo da Memória</h1>
 
@@ -169,6 +191,7 @@ export const MemoryGamePage = ({
           <GameBoard
             boardColumns={boardColumns}
             boardRows={boardRows}
+            cardPattern={cardPattern}
             phase={phase}
             isResolving={isResolving}
             onCardClick={handleCardClick}

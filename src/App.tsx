@@ -2,18 +2,9 @@ import { useUiTheme } from './hooks/useUiTheme.ts'
 import { MemoryGamePage } from './pages/MemoryGamePage.tsx'
 
 const App = () => {
-  const { uiTheme, uiThemes, nextTheme, cycleUiTheme, selectUiTheme } = useUiTheme()
+  const { uiTheme, uiThemes, selectUiTheme } = useUiTheme()
 
-  return (
-    <MemoryGamePage
-      uiTheme={uiTheme}
-      uiThemes={uiThemes}
-      currentThemeLabel={uiThemes[uiTheme].label}
-      nextThemeLabel={uiThemes[nextTheme].label}
-      onCycleUiTheme={cycleUiTheme}
-      onSelectUiTheme={selectUiTheme}
-    />
-  )
+  return <MemoryGamePage uiTheme={uiTheme} uiThemes={uiThemes} onSelectUiTheme={selectUiTheme} />
 }
 
 export default App
