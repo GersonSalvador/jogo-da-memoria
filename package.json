@@ -15,6 +15,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@dicebear/avataaars": "^9.2.4",
+    "@dicebear/bottts": "^9.2.4",
+    "@dicebear/core": "^9.2.4",
+    "@dicebear/pixel-art": "^9.2.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
