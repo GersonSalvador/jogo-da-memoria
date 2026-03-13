@@ -21,17 +21,27 @@ export const DIFFICULTIES = {
   },
 } as const
 
+export const UI_THEMES = {
+  claro: {
+    label: 'Claro',
+    icon: 'sun',
+  },
+  escuro: {
+    label: 'Escuro',
+    icon: 'moon',
+  },
+  sepia: {
+    label: 'Sepia',
+    icon: 'book',
+  },
+  oceano: {
+    label: 'Oceano',
+    icon: 'wave',
+  },
+} as const
+
 /** Estilo fixo das cartas — Bots (bottts do DiceBear) */
 export const CARD_THEME = 'bottts' as const
 
-/** Temas de cor do layout do aplicativo */
-export const COLOR_THEMES = {
-  roxo:     { label: 'Roxo',     accent: '#aa3bff' },
-  oceano:   { label: 'Oceano',   accent: '#3b82f6' },
-  floresta: { label: 'Floresta', accent: '#22c55e' },
-  solar:    { label: 'Solar',    accent: '#f97316' },
-  rosa:     { label: 'Rosa',     accent: '#ec4899' },
-} as const
-
 export type DifficultyKey = keyof typeof DIFFICULTIES
-export type ColorThemeKey = keyof typeof COLOR_THEMES
+export type UiThemeKey = keyof typeof UI_THEMES

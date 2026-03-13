@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test'
 
 test.describe('Jogo da Memória', () => {
-  test('deve iniciar partida apos escolher dificuldade e alternar tema global', async ({ page }) => {
+  test('deve iniciar partida apos escolher dificuldade e alternar tema global', async ({
+    page,
+  }) => {
     await page.goto('/')
 
     await expect(page.getByRole('button', { name: /alternar tema/i })).toBeVisible()
