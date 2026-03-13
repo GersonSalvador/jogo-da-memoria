@@ -14,6 +14,20 @@ type CreateDeckInput = {
   theme: ThemeKey
 }
 
+const shuffleDeck = (cards: MemoryCard[]): MemoryCard[] => {
+  const shuffledCards = [...cards]
+
+  for (let index = shuffledCards.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    const currentCard = shuffledCards[index]
+
+    shuffledCards[index] = shuffledCards[randomIndex]!
+    shuffledCards[randomIndex] = currentCard!
+  }
+
+  return shuffledCards
+}
+
 export const createDeck = ({ totalCards, theme }: CreateDeckInput): MemoryCard[] => {
   const totalPairs = totalCards / 2
   const deck: MemoryCard[] = []
@@ -41,5 +55,5 @@ export const createDeck = ({ totalCards, theme }: CreateDeckInput): MemoryCard[]
     })
   }
 
-  return deck
+  return shuffleDeck(deck)
 }

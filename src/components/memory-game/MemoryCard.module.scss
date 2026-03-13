@@ -1,0 +1,74 @@
+@use '../../styles/tokens' as *;
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  width: min(100%, 120px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  perspective: 900px;
+  overflow: hidden;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+}
+
+.cardInner {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transform-origin: center;
+}
+
+.cardFace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+  transition: transform 280ms ease;
+  will-change: transform;
+}
+
+.cardBack {
+  background: var(--social-bg);
+  color: var(--text-h);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transform: rotateY(0deg);
+}
+
+.cardFront {
+  background: var(--social-bg);
+  transform: rotateY(-180deg);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+}
+
+.card[data-flipped='true'] .cardBack {
+  transform: rotateY(180deg);
+}
+
+.card[data-flipped='true'] .cardFront {
+  transform: rotateY(0deg);
+}

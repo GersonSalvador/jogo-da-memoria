@@ -1,5 +1,6 @@
 import type { GamePhase } from '../../hooks/useMemoryGame.ts'
 import type { MemoryCard } from '../../services/memoryDeck.ts'
+import { MemoryCard as GameCard } from './MemoryCard.tsx'
 import styles from './GameBoard.module.scss'
 
 type GameBoardProps = {
@@ -11,30 +12,20 @@ type GameBoardProps = {
 
 export const GameBoard = ({ boardRows, phase, isResolving, onCardClick }: GameBoardProps) => {
   return (
-    <table className={styles.board} role="grid" aria-label="Tabuleiro de cartas">
-      <tbody>
-        {boardRows.map((row, rowIndex) => (
-          <tr key={`row-${rowIndex}`}>
-            {row.map((card) => (
-              <td key={card.id}>
-                <button
-                  type="button"
-                  className={styles.card}
-                  aria-label="Carta"
-                  onClick={() => onCardClick(card.id)}
-                  disabled={phase !== 'playing' || card.isMatched || card.isFaceUp || isResolving}
-                >
-                  {card.isFaceUp || card.isMatched ? (
-                    <img src={card.face} alt={`Face ${card.pairId + 1}`} loading="lazy" />
-                  ) : (
-                    <span className={styles.cardBack}>?</span>
-                  )}
-                </button>
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <section className={styles.board} role="grid" aria-label="Tabuleiro de cartas">
+      {boardRows.map((row, rowIndex) => (
+        <div key={`row-${rowIndex}`} role="row" className={styles.row}>
+          {row.map((card) => (
+            <div key={card.id} role="gridcell">
+              <GameCard
+                card={card}
+                isDisabled={phase !== 'playing' || card.isMatched || card.isFaceUp || isResolving}
+                onClick={onCardClick}
+              />
+            </div>
+          ))}
+        </div>
+      ))}
+    </section>
   )
 }
