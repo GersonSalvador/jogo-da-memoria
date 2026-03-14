@@ -62,8 +62,8 @@ const SOUND_LIBRARY: Record<GameSoundEvent, SoundDescriptor> = {
     cooldownMs: 40,
   },
   cardFlipDown: {
-    id: 240776,
-    ownerId: 4107740,
+    id: 536782,
+    ownerId: 1415754,
     fallbackFormat: 'mp3',
     volume: 0.5,
     cooldownMs: 120,

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { GameAnimation } from '../components/memory-game/GameAnimation.tsx'
 import { GameBoard } from '../components/memory-game/GameBoard.tsx'
 import { GameResult } from '../components/memory-game/GameResult.tsx'
@@ -112,20 +112,12 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   const { topOverall, lastPlayerName, saveEntry, getTopForDifficulty } = useLeaderboard()
   const { isAudioEnabled, audioEventSettings, playSound, toggleAudio, toggleSoundEvent } =
     useGameAudio()
+  const [dealSequence, setDealSequence] = useState(0)
 
   const previousPhaseRef = useRef(phase)
   const previousIsResolvingRef = useRef(isResolving)
   const previousMatchedPairsRef = useRef(matchedPairs)
   const previousRemainingSecondsRef = useRef(remainingSeconds)
-  const startGameTimeoutRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (startGameTimeoutRef.current !== null) {
-        window.clearTimeout(startGameTimeoutRef.current)
-      }
-    }
-  }, [])
 
   useEffect(() => {
     const previousPhase = previousPhaseRef.current
@@ -181,21 +173,12 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   }
 
   const handleStartGame = () => {
-    if (!isAudioEnabled || !audioEventSettings.gameStart) {
-      startGameBase()
-      return
+    startGameBase()
+    setDealSequence((sequence) => sequence + 1)
+
+    if (isAudioEnabled && audioEventSettings.gameStart) {
+      playSound('gameStart', { startAtSeconds: 0.72 })
     }
-
-    playSound('gameStart', { startAtSeconds: 0.72 })
-
-    if (startGameTimeoutRef.current !== null) {
-      window.clearTimeout(startGameTimeoutRef.current)
-    }
-
-    startGameTimeoutRef.current = window.setTimeout(() => {
-      startGameBase()
-      startGameTimeoutRef.current = null
-    }, 720)
   }
 
   const handleCardClick = (cardId: string) => {
@@ -215,6 +198,9 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   }
 
   const handleAbandonGame = () => {
+    if (phase === 'playing') {
+      playSound('gameLost')
+    }
     abandonGame()
   }
 
@@ -366,6 +352,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
             cardPattern={cardPattern}
             phase={phase}
             isResolving={isResolving}
+            dealSequence={dealSequence}
             onCardClick={handleCardClick}
           />
           <GameResult phase={phase} score={score} onPlayAgain={handlePlayAgain} />

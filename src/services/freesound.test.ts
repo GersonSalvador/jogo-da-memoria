@@ -41,4 +41,13 @@ describe('freesound service', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(url).toBe('https://cdn.freesound.org/previews/custom/audio.mp3')
   })
+
+  it('deve resolver cardFlipDown para o som solicitado no fallback CDN', async () => {
+    vi.stubEnv('VITE_FREESOUND_API_TOKEN', '')
+
+    const { resolveSoundUrl } = await import('./freesound.ts')
+    const url = await resolveSoundUrl('cardFlipDown')
+
+    expect(url).toBe('https://cdn.freesound.org/previews/536/536782_1415754-lq.mp3')
+  })
 })
