@@ -14,6 +14,10 @@ type MemoryGameState = {
   difficulty: DifficultyKey
   cardPattern: CardPatternKey
   phase: GamePhase
+  currentGameHighlight: {
+    score: number
+    difficulty: DifficultyKey
+  } | null
   cards: MemoryCard[]
   flippedCardIds: string[]
   errors: number
@@ -65,6 +69,7 @@ const initialState: MemoryGameState = {
   difficulty: 'facil',
   cardPattern: getInitialCardPattern(),
   phase: 'setup',
+  currentGameHighlight: null,
   cards: [],
   flippedCardIds: [],
   errors: 0,
@@ -107,6 +112,7 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
     case 'START_GAME': {
       return {
         ...state,
+        currentGameHighlight: null,
         cards: action.payload.cards.map((card) => ({
           ...card,
           isFaceUp: false,
@@ -197,6 +203,10 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
             matchedPairs: nextMatchedPairs,
             score: finalScore,
             phase: 'won',
+            currentGameHighlight: {
+              score: finalScore,
+              difficulty: state.difficulty,
+            },
             showSaveModal: true,
           }
         }
@@ -246,6 +256,12 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
 
       const nextRemainingSeconds = Math.max(state.remainingSeconds - 1, 0)
       if (nextRemainingSeconds === 0) {
+        const finalScore = calculateScore({
+          matchedPairs: state.matchedPairs,
+          remainingSeconds: 0,
+          errors: state.errors,
+        })
+
         return {
           ...state,
           cards: state.cards.map((card) => ({
@@ -255,11 +271,11 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
           flippedCardIds: [],
           isResolving: false,
           remainingSeconds: 0,
-          score: calculateScore({
-            matchedPairs: state.matchedPairs,
-            remainingSeconds: 0,
-            errors: state.errors,
-          }),
+          score: finalScore,
+          currentGameHighlight: {
+            score: finalScore,
+            difficulty: state.difficulty,
+          },
           phase: 'lost',
         }
       }
@@ -432,6 +448,7 @@ export const useMemoryGame = () => {
     difficulty: state.difficulty,
     cardPattern: state.cardPattern,
     phase: state.phase,
+    currentGameHighlight: state.currentGameHighlight,
     errors: state.errors,
     matchedPairs: state.matchedPairs,
     remainingSeconds: state.remainingSeconds,

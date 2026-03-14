@@ -91,6 +91,54 @@
   background: var(--accent-bg);
 }
 
+.currentGameScoreRow {
+  background: color-mix(in srgb, #f5c451 16%, transparent);
+  animation: current-score-row-pulse 2.6s ease-out 1;
+}
+
+.currentGameScoreValue {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+@keyframes current-score-row-pulse {
+  0% {
+    background: color-mix(in srgb, #f5c451 40%, transparent);
+  }
+
+  12% {
+    background: transparent;
+  }
+
+  24% {
+    background: color-mix(in srgb, #f5c451 36%, transparent);
+  }
+
+  36% {
+    background: transparent;
+  }
+
+  48% {
+    background: color-mix(in srgb, #f5c451 32%, transparent);
+  }
+
+  60% {
+    background: transparent;
+  }
+
+  72% {
+    background: color-mix(in srgb, #f5c451 24%, transparent);
+  }
+
+  84% {
+    background: transparent;
+  }
+
+  100% {
+    background: color-mix(in srgb, #f5c451 16%, transparent);
+  }
+}
+
 .position {
   width: 2rem;
   text-align: center;

@@ -90,6 +90,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
     difficulty,
     cardPattern,
     phase,
+    currentGameHighlight,
     errors,
     matchedPairs,
     remainingSeconds,
@@ -375,7 +376,11 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
       <h1>Jogo da Memória</h1>
 
       {phase !== 'playing' && (
-        <LeaderboardPanel topOverall={topOverall} getTopForDifficulty={getTopForDifficulty} />
+        <LeaderboardPanel
+          topOverall={topOverall}
+          getTopForDifficulty={getTopForDifficulty}
+          currentGameHighlight={currentGameHighlight}
+        />
       )}
 
       {phase === 'setup' ? (

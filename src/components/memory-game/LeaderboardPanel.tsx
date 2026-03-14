@@ -24,15 +24,24 @@ type EntryRowProps = {
   entry: LeaderboardEntry
   position: number
   showDifficulty: boolean
+  isCurrentGameScore: boolean
 }
 
-const EntryRow = ({ entry, position, showDifficulty }: EntryRowProps) => (
-  <tr className={styles.row}>
+const EntryRow = ({ entry, position, showDifficulty, isCurrentGameScore }: EntryRowProps) => (
+  <tr
+    className={`${styles.row} ${isCurrentGameScore ? styles.currentGameScoreRow : ''}`}
+    data-current-game-score={isCurrentGameScore}
+  >
     <td className={styles.position} aria-label={`Posição ${position}`}>
       {position}
     </td>
     <td className={styles.playerName}>{entry.playerName}</td>
-    <td className={styles.score}>{entry.score.toLocaleString('pt-BR')}</td>
+    <td
+      className={`${styles.score} ${isCurrentGameScore ? styles.currentGameScoreValue : ''}`}
+      data-highlighted-score={isCurrentGameScore}
+    >
+      {entry.score.toLocaleString('pt-BR')}
+    </td>
     {showDifficulty && (
       <td className={styles.difficulty}>{DIFFICULTIES[entry.difficulty].label}</td>
     )}
@@ -43,15 +52,34 @@ const EntryRow = ({ entry, position, showDifficulty }: EntryRowProps) => (
 type LeaderboardPanelProps = {
   topOverall: LeaderboardEntry[]
   getTopForDifficulty: (difficulty: DifficultyKey) => LeaderboardEntry[]
+  currentGameHighlight?: {
+    score: number
+    difficulty: DifficultyKey
+  } | null
 }
 
-export const LeaderboardPanel = ({ topOverall, getTopForDifficulty }: LeaderboardPanelProps) => {
+export const LeaderboardPanel = ({
+  topOverall,
+  getTopForDifficulty,
+  currentGameHighlight = null,
+}: LeaderboardPanelProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('geral')
 
   const entries: LeaderboardEntry[] =
     activeTab === 'geral' ? topOverall : getTopForDifficulty(activeTab)
 
   const showDifficulty = activeTab === 'geral'
+  const shouldHighlightCurrentScore =
+    currentGameHighlight !== null &&
+    (activeTab === 'geral' || activeTab === currentGameHighlight.difficulty)
+
+  const highlightedEntryId = shouldHighlightCurrentScore
+    ? (entries.find(
+        (entry) =>
+          entry.score === currentGameHighlight.score &&
+          entry.difficulty === currentGameHighlight.difficulty,
+      )?.id ?? null)
+    : null
 
   return (
     <section className={styles.panel} aria-label="Quadro de melhores pontuações">
@@ -112,6 +140,7 @@ export const LeaderboardPanel = ({ topOverall, getTopForDifficulty }: Leaderboar
                   entry={entry}
                   position={index + 1}
                   showDifficulty={showDifficulty}
+                  isCurrentGameScore={entry.id === highlightedEntryId}
                 />
               ))}
             </tbody>

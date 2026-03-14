@@ -311,6 +311,49 @@ describe('Jogo da Memória - integração de UI', () => {
     expect(view.getByRole('region', { name: /melhores pontuações/i })).toBeInTheDocument()
   })
 
+  it('deve destacar a pontuação atual em uma linha existente e remover ao iniciar nova partida', async () => {
+    vi.useFakeTimers()
+    window.localStorage.setItem(
+      'memory-game.leaderboard',
+      JSON.stringify({
+        entries: [
+          {
+            id: 'seed-entry-1',
+            playerName: 'Jogador Base',
+            score: 0,
+            difficulty: 'facil',
+            matchedPairs: 0,
+            errors: 2,
+            remainingSeconds: 0,
+            timestamp: 1,
+          },
+        ],
+        lastPlayerName: 'Jogador Base',
+      }),
+    )
+
+    const view = render(<App />)
+
+    fireEvent.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
+    fireEvent.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(130_000)
+    })
+
+    const currentGameScoreRow = view.container.querySelector('[data-current-game-score="true"]')
+    expect(currentGameScoreRow).toBeInTheDocument()
+    expect(currentGameScoreRow).toHaveTextContent(/jogador base/i)
+    expect(view.queryByText(/partida atual/i)).not.toBeInTheDocument()
+
+    fireEvent.click(view.getByRole('button', { name: /jogar novamente/i }))
+    fireEvent.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
+    fireEvent.click(view.getByRole('button', { name: /iniciar partida/i }))
+    fireEvent.click(view.getByRole('button', { name: /abandonar partida/i }))
+
+    expect(view.container.querySelector('[data-current-game-score="true"]')).not.toBeInTheDocument()
+  })
+
   it('deve ocultar quadro de pontuações durante a partida', async () => {
     const user = userEvent.setup()
     const view = render(<App />)
