@@ -22,6 +22,7 @@ Antes de iniciar, o jogador escolhe a dificuldade. Durante a partida, o cronôme
 - seleção de tema visual da interface: Claro, Escuro, Sepia e Oceano
 - seleção do padrão do verso das cartas: Clássico, Listras diagonais, Pontos, Ondas suaves e Grade geométrica
 - cartas geradas com avatares via DiceBear no tema bottts
+- efeitos sonoros de jogo integrados com Freesound (início, flip, erro, acerto, vitória, derrota, countdown e clique)
 - foco em acessibilidade com navegação por teclado, semântica e estados visuais claros
 - cobertura por testes unitários, integração e E2E
 
@@ -91,6 +92,18 @@ Aplicação disponível em:
 ```text
 http://localhost:5173
 ```
+
+## Configuração de áudio (Freesound)
+
+Para resolver os previews pela API oficial do Freesound, defina a variável de ambiente abaixo:
+
+```bash
+VITE_FREESOUND_API_TOKEN=seu_token_do_freesound
+```
+
+Sem token, a aplicação usa fallback direto para previews CDN dos mesmos sons.
+
+Para produção, prefira um proxy/backend para não expor token no bundle do front-end.
 
 ## Como rodar com Docker
 

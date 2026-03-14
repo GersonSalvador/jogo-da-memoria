@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { GameAnimation } from '../components/memory-game/GameAnimation.tsx'
 import { GameBoard } from '../components/memory-game/GameBoard.tsx'
 import { GameResult } from '../components/memory-game/GameResult.tsx'
@@ -5,9 +6,11 @@ import { GameSetup } from '../components/memory-game/GameSetup.tsx'
 import { GameStatus } from '../components/memory-game/GameStatus.tsx'
 import { LeaderboardPanel } from '../components/memory-game/LeaderboardPanel.tsx'
 import { SaveScoreModal } from '../components/memory-game/SaveScoreModal.tsx'
+import { useGameAudio } from '../hooks/useGameAudio.ts'
 import { useLeaderboard } from '../hooks/useLeaderboard.ts'
 import { useMemoryGame } from '../hooks/useMemoryGame.ts'
 import { CARD_PATTERNS, type UiThemeKey } from '../services/gameConfig.ts'
+import { CONFIGURABLE_SOUND_EVENTS, SOUND_EVENT_LABELS } from '../services/freesound.ts'
 import styles from './MemoryGamePage.module.scss'
 
 type MemoryGamePageProps = {
@@ -99,18 +102,136 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
     cardPatternOptions,
     setDifficulty,
     setCardPattern,
-    startGame,
-    handleCardClick,
-    handlePlayAgain,
+    startGame: startGameBase,
+    handleCardClick: handleCardClickBase,
+    handlePlayAgain: handlePlayAgainBase,
     abandonGame,
     closeSaveModal,
   } = useMemoryGame()
 
   const { topOverall, lastPlayerName, saveEntry, getTopForDifficulty } = useLeaderboard()
+  const { isAudioEnabled, audioEventSettings, playSound, toggleAudio, toggleSoundEvent } =
+    useGameAudio()
+
+  const previousPhaseRef = useRef(phase)
+  const previousIsResolvingRef = useRef(isResolving)
+  const previousMatchedPairsRef = useRef(matchedPairs)
+  const previousRemainingSecondsRef = useRef(remainingSeconds)
+  const startGameTimeoutRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (startGameTimeoutRef.current !== null) {
+        window.clearTimeout(startGameTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const previousPhase = previousPhaseRef.current
+
+    if (phase !== previousPhase) {
+      if (phase === 'won') {
+        playSound('gameWon')
+      }
+
+      if (phase === 'lost') {
+        playSound('gameLost')
+      }
+    }
+
+    previousPhaseRef.current = phase
+  }, [phase, playSound])
+
+  useEffect(() => {
+    const previousIsResolving = previousIsResolvingRef.current
+    if (previousIsResolving && !isResolving && phase === 'playing') {
+      playSound('cardFlipDown')
+    }
+
+    previousIsResolvingRef.current = isResolving
+  }, [isResolving, phase, playSound])
+
+  useEffect(() => {
+    const previousMatchedPairs = previousMatchedPairsRef.current
+    if (matchedPairs > previousMatchedPairs && phase === 'playing') {
+      playSound('pairMatched')
+    }
+
+    previousMatchedPairsRef.current = matchedPairs
+  }, [matchedPairs, phase, playSound])
+
+  useEffect(() => {
+    const previousRemainingSeconds = previousRemainingSecondsRef.current
+    if (
+      phase === 'playing' &&
+      remainingSeconds > 0 &&
+      remainingSeconds <= 3 &&
+      remainingSeconds !== previousRemainingSeconds
+    ) {
+      playSound('countdownTick')
+    }
+
+    previousRemainingSecondsRef.current = remainingSeconds
+  }, [phase, remainingSeconds, playSound])
 
   const handleSaveScore = (playerName: string) => {
     saveEntry({ playerName, score, difficulty, matchedPairs, errors, remainingSeconds })
     closeSaveModal()
+  }
+
+  const handleStartGame = () => {
+    if (!isAudioEnabled || !audioEventSettings.gameStart) {
+      startGameBase()
+      return
+    }
+
+    playSound('gameStart', { startAtSeconds: 0.72 })
+
+    if (startGameTimeoutRef.current !== null) {
+      window.clearTimeout(startGameTimeoutRef.current)
+    }
+
+    startGameTimeoutRef.current = window.setTimeout(() => {
+      startGameBase()
+      startGameTimeoutRef.current = null
+    }, 720)
+  }
+
+  const handleCardClick = (cardId: string) => {
+    const faceUpUnmatchedCount = boardRows
+      .flat()
+      .filter((card) => card.isFaceUp && !card.isMatched).length
+
+    if (phase === 'playing' && !isResolving && faceUpUnmatchedCount === 0) {
+      playSound('cardFlipUp')
+    }
+
+    handleCardClickBase(cardId)
+  }
+
+  const handlePlayAgain = () => {
+    handlePlayAgainBase()
+  }
+
+  const handleAbandonGame = () => {
+    abandonGame()
+  }
+
+  const handleCloseSaveModal = () => {
+    closeSaveModal()
+  }
+
+  const handleThemeSelect = (themeKey: UiThemeKey) => {
+    onSelectUiTheme(themeKey)
+  }
+
+  const handleCardPatternSelect = (patternOption: keyof typeof CARD_PATTERNS) => {
+    setCardPattern(patternOption)
+  }
+
+  const handleDifficultySelect = (difficultyOption: typeof difficulty) => {
+    setDifficulty(difficultyOption)
   }
 
   return (
@@ -142,7 +263,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
                     role="menuitemradio"
                     aria-checked={uiTheme === themeKey}
                     className={`${styles.themeOption} ${uiTheme === themeKey ? styles.themeOptionActive : ''}`}
-                    onClick={() => onSelectUiTheme(themeKey)}
+                    onClick={() => handleThemeSelect(themeKey)}
                   >
                     <ThemeIcon theme={themeKey} />
                     <span>{label}</span>
@@ -161,7 +282,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
                   role="menuitemradio"
                   aria-checked={cardPattern === patternOption}
                   className={`${styles.themeOption} ${cardPattern === patternOption ? styles.themeOptionActive : ''}`}
-                  onClick={() => setCardPattern(patternOption)}
+                  onClick={() => handleCardPatternSelect(patternOption)}
                 >
                   <span
                     className={styles.patternSwatch}
@@ -169,6 +290,49 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
                     aria-hidden="true"
                   />
                   <span>{CARD_PATTERNS[patternOption].label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <p className={styles.menuTitle}>Sons</p>
+          <button
+            type="button"
+            className={`${styles.themeOption} ${styles.audioToggle}`}
+            role="menuitemcheckbox"
+            aria-checked={isAudioEnabled}
+            onClick={toggleAudio}
+          >
+            <input
+              type="checkbox"
+              className={styles.soundCheckbox}
+              checked={isAudioEnabled}
+              readOnly
+              tabIndex={-1}
+              aria-hidden="true"
+            />
+            <span>{isAudioEnabled ? 'Som ligado' : 'Som desligado'}</span>
+          </button>
+          <ul className={styles.menuList}>
+            {CONFIGURABLE_SOUND_EVENTS.map((event) => (
+              <li key={event}>
+                <button
+                  type="button"
+                  role="menuitemcheckbox"
+                  aria-checked={isAudioEnabled ? audioEventSettings[event] : false}
+                  disabled={!isAudioEnabled}
+                  className={`${styles.themeOption} ${styles.soundOption}`}
+                  onClick={() => toggleSoundEvent(event)}
+                >
+                  <input
+                    type="checkbox"
+                    className={styles.soundCheckbox}
+                    checked={isAudioEnabled && audioEventSettings[event]}
+                    readOnly
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
+                  <span>{SOUND_EVENT_LABELS[event]}</span>
                 </button>
               </li>
             ))}
@@ -185,8 +349,8 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
         <GameSetup
           difficulty={difficulty}
           difficultyOptions={difficultyOptions}
-          onDifficultyChange={setDifficulty}
-          onStartGame={startGame}
+          onDifficultyChange={handleDifficultySelect}
+          onStartGame={handleStartGame}
         />
       ) : (
         <div className={styles.playArea}>
@@ -194,7 +358,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
             remainingSeconds={remainingSeconds}
             errors={errors}
             score={score}
-            onAbandon={abandonGame}
+            onAbandon={handleAbandonGame}
           />
           <GameBoard
             boardColumns={boardColumns}
@@ -213,7 +377,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
           lastPlayerName={lastPlayerName}
           score={score}
           onSave={handleSaveScore}
-          onDismiss={closeSaveModal}
+          onDismiss={handleCloseSaveModal}
         />
       )}
     </main>

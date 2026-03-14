@@ -113,6 +113,37 @@
   font-weight: 600;
 }
 
+.audioToggle {
+  margin-bottom: $spacing-xs;
+  font-weight: 600;
+}
+
+.soundOption,
+.audioToggle {
+  background: transparent;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+.soundOption:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+.soundCheckbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  pointer-events: none;
+}
+
 .menuTitle {
   margin: 0;
   padding: 0.35rem 0.55rem;
