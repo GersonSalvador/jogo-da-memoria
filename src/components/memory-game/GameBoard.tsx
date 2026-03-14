@@ -187,6 +187,7 @@ export const GameBoard = ({
               <GameCard
                 card={card}
                 cardPattern={cardPattern}
+                isDimmed={phase !== 'playing' && !card.isMatched}
                 isDisabled={
                   phase !== 'playing' ||
                   card.isMatched ||

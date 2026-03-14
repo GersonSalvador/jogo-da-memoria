@@ -181,6 +181,16 @@ describe('Jogo da Memória - integração de UI', () => {
 
     expect(view.getByRole('heading', { name: /tempo esgotado/i })).toBeInTheDocument()
     expect(view.getByRole('button', { name: /jogar novamente/i })).toBeInTheDocument()
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    expect(cards.length).toBeGreaterThan(0)
+
+    for (const card of cards) {
+      expect(card).toHaveAttribute('data-flipped', 'true')
+    }
+
+    const dimmedCards = cards.filter((card) => card.getAttribute('data-dimmed') === 'true')
+    expect(dimmedCards.length).toBeGreaterThan(0)
   })
 
   it('deve encerrar com vitória e exibir pontuação final', async () => {

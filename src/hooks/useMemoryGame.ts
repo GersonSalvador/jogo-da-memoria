@@ -248,6 +248,12 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
       if (nextRemainingSeconds === 0) {
         return {
           ...state,
+          cards: state.cards.map((card) => ({
+            ...card,
+            isFaceUp: true,
+          })),
+          flippedCardIds: [],
+          isResolving: false,
           remainingSeconds: 0,
           score: calculateScore({
             matchedPairs: state.matchedPairs,

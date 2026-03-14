@@ -5,11 +5,12 @@ import styles from './MemoryCard.module.scss'
 type MemoryCardProps = {
   card: MemoryCardType
   cardPattern: CardPatternKey
+  isDimmed: boolean
   isDisabled: boolean
   onClick: (cardId: string) => void
 }
 
-export const MemoryCard = ({ card, cardPattern, isDisabled, onClick }: MemoryCardProps) => {
+export const MemoryCard = ({ card, cardPattern, isDimmed, isDisabled, onClick }: MemoryCardProps) => {
   const isFlipped = card.isFaceUp || card.isMatched
 
   return (
@@ -20,6 +21,7 @@ export const MemoryCard = ({ card, cardPattern, isDisabled, onClick }: MemoryCar
       onClick={() => onClick(card.id)}
       disabled={isDisabled}
       data-flipped={isFlipped}
+      data-dimmed={isDimmed}
     >
       <div className={styles.cardInner}>
         <div

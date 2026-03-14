@@ -115,3 +115,7 @@
 .card[data-flipped='true'] .cardFront {
   transform: rotateY(0deg);
 }
+
+.card[data-dimmed='true'][data-flipped='true'] .cardFront img {
+  opacity: 0.5;
+}
