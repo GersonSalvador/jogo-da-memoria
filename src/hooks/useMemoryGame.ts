@@ -21,6 +21,7 @@ type MemoryGameState = {
   remainingSeconds: number
   score: number
   isResolving: boolean
+  isInitializingRound: boolean
   showSaveModal: boolean
 }
 
@@ -51,11 +52,13 @@ type MemoryGameAction =
   | { type: 'SET_DIFFICULTY'; payload: DifficultyKey }
   | { type: 'SET_CARD_PATTERN'; payload: CardPatternKey }
   | { type: 'START_GAME'; payload: StartGamePayload }
+  | { type: 'SHOW_ROUND_PREVIEW' }
   | { type: 'CARD_CLICK'; payload: string }
   | { type: 'HIDE_MISMATCH' }
   | { type: 'TICK' }
   | { type: 'ABANDON_GAME' }
   | { type: 'BACK_TO_SETUP' }
+  | { type: 'COMPLETE_ROUND_INITIALIZATION' }
   | { type: 'CLOSE_SAVE_MODAL' }
 
 const initialState: MemoryGameState = {
@@ -69,6 +72,7 @@ const initialState: MemoryGameState = {
   remainingSeconds: 0,
   score: 0,
   isResolving: false,
+  isInitializingRound: false,
   showSaveModal: false,
 }
 
@@ -103,19 +107,38 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
     case 'START_GAME': {
       return {
         ...state,
-        cards: action.payload.cards,
+        cards: action.payload.cards.map((card) => ({
+          ...card,
+          isFaceUp: false,
+          isMatched: false,
+        })),
         flippedCardIds: [],
         errors: 0,
         matchedPairs: 0,
         remainingSeconds: action.payload.timeLimitSeconds,
         score: 0,
         isResolving: false,
+        isInitializingRound: true,
         phase: 'playing',
       }
     }
 
+    case 'SHOW_ROUND_PREVIEW': {
+      if (!state.isInitializingRound || state.phase !== 'playing') {
+        return state
+      }
+
+      return {
+        ...state,
+        cards: state.cards.map((card) => ({
+          ...card,
+          isFaceUp: true,
+        })),
+      }
+    }
+
     case 'CARD_CLICK': {
-      if (state.phase !== 'playing' || state.isResolving) {
+      if (state.phase !== 'playing' || state.isResolving || state.isInitializingRound) {
         return state
       }
 
@@ -217,7 +240,7 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
     }
 
     case 'TICK': {
-      if (state.phase !== 'playing') {
+      if (state.phase !== 'playing' || state.isInitializingRound) {
         return state
       }
 
@@ -251,6 +274,7 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
         remainingSeconds: 0,
         score: 0,
         isResolving: false,
+        isInitializingRound: false,
         showSaveModal: false,
         phase: 'setup',
       }
@@ -260,7 +284,24 @@ const memoryGameReducer = (state: MemoryGameState, action: MemoryGameAction): Me
       return {
         ...state,
         phase: 'setup',
+        isInitializingRound: false,
         showSaveModal: false,
+      }
+    }
+
+    case 'COMPLETE_ROUND_INITIALIZATION': {
+      if (!state.isInitializingRound || state.phase !== 'playing') {
+        return state
+      }
+
+      return {
+        ...state,
+        cards: state.cards.map((card) => ({
+          ...card,
+          isFaceUp: false,
+        })),
+        flippedCardIds: [],
+        isInitializingRound: false,
       }
     }
 
@@ -373,6 +414,14 @@ export const useMemoryGame = () => {
     dispatch({ type: 'CLOSE_SAVE_MODAL' })
   }
 
+  const completeRoundInitialization = () => {
+    dispatch({ type: 'COMPLETE_ROUND_INITIALIZATION' })
+  }
+
+  const showRoundPreview = () => {
+    dispatch({ type: 'SHOW_ROUND_PREVIEW' })
+  }
+
   return {
     difficulty: state.difficulty,
     cardPattern: state.cardPattern,
@@ -382,6 +431,7 @@ export const useMemoryGame = () => {
     remainingSeconds: state.remainingSeconds,
     score: state.score,
     isResolving: state.isResolving,
+    isInitializingRound: state.isInitializingRound,
     showSaveModal: state.showSaveModal,
     boardColumns,
     boardRows,
@@ -394,5 +444,7 @@ export const useMemoryGame = () => {
     handlePlayAgain,
     abandonGame,
     closeSaveModal,
+    showRoundPreview,
+    completeRoundInitialization,
   }
 }

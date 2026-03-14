@@ -5,6 +5,21 @@ import { DIFFICULTIES } from './services/gameConfig'
 import App from './App'
 import type { MemoryCard } from './services/memoryDeck.ts'
 
+const INITIAL_DEAL_PHASE_MS = 2_200
+const INITIAL_ROUND_PREVIEW_TOTAL_MS = 5_000
+
+const startGameAndFinishInitialPreview = async (
+  view: ReturnType<typeof render>,
+  difficultyLabel: string = DIFFICULTIES.facil.label,
+) => {
+  fireEvent.click(view.getByRole('button', { name: difficultyLabel }))
+  fireEvent.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(INITIAL_ROUND_PREVIEW_TOTAL_MS)
+  })
+}
+
 vi.mock('./services/memoryDeck.ts', async () => {
   const actual = (await vi.importActual('./services/memoryDeck.ts')) as Record<string, unknown>
 
@@ -110,20 +125,47 @@ describe('Jogo da Memória - integração de UI', () => {
   })
 
   it('deve atualizar erros e pontuação quando jogador erra um par', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
     expect(cards.length).toBeGreaterThanOrEqual(3)
 
-    await user.click(cards[0]!)
-    await user.click(cards[2]!)
+    fireEvent.click(cards[0]!)
+    fireEvent.click(cards[2]!)
 
     expect(view.getByText(/erros:/i)).toHaveTextContent('1')
     expect(view.getByText(/pontuação:/i)).toHaveTextContent('-15')
+  })
+
+  it('deve espalhar cartas ocultas, revelar a prévia e só então liberar o jogo', async () => {
+    vi.useFakeTimers()
+    const view = render(<App />)
+
+    fireEvent.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
+    fireEvent.click(view.getByRole('button', { name: /iniciar partida/i }))
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    const firstCard = cards[0]!
+
+    expect(firstCard).toBeDisabled()
+    expect(firstCard).toHaveAttribute('data-flipped', 'false')
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(INITIAL_DEAL_PHASE_MS)
+    })
+
+    expect(firstCard).toBeDisabled()
+    expect(firstCard).toHaveAttribute('data-flipped', 'true')
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(INITIAL_ROUND_PREVIEW_TOTAL_MS - INITIAL_DEAL_PHASE_MS)
+    })
+
+    expect(firstCard).toBeEnabled()
+    expect(firstCard).toHaveAttribute('data-flipped', 'false')
   })
 
   it('deve encerrar com derrota quando o tempo chegar a zero', async () => {
@@ -134,7 +176,7 @@ describe('Jogo da Memória - integração de UI', () => {
     fireEvent.click(view.getByRole('button', { name: /iniciar partida/i }))
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(120_000)
+      await vi.advanceTimersByTimeAsync(130_000)
     })
 
     expect(view.getByRole('heading', { name: /tempo esgotado/i })).toBeInTheDocument()
@@ -142,18 +184,17 @@ describe('Jogo da Memória - integração de UI', () => {
   })
 
   it('deve encerrar com vitória e exibir pontuação final', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
     expect(cards.length % 2).toBe(0)
 
     for (let index = 0; index < cards.length; index += 2) {
-      await user.click(cards[index]!)
-      await user.click(cards[index + 1]!)
+      fireEvent.click(cards[index]!)
+      fireEvent.click(cards[index + 1]!)
     }
 
     expect(view.getByRole('dialog', { name: /você venceu/i })).toBeInTheDocument()
@@ -163,58 +204,54 @@ describe('Jogo da Memória - integração de UI', () => {
   it('deve pré-preencher o campo de nome com o último nome salvo', async () => {
     window.localStorage.setItem('memory-game.last-player-name', 'Fulano')
 
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
     for (let index = 0; index < cards.length; index += 2) {
-      await user.click(cards[index]!)
-      await user.click(cards[index + 1]!)
+      fireEvent.click(cards[index]!)
+      fireEvent.click(cards[index + 1]!)
     }
 
     expect(view.getByLabelText(/seu nome/i)).toHaveValue('Fulano')
   })
 
   it('botão salvar deve estar desabilitado quando nome está vazio', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
     for (let index = 0; index < cards.length; index += 2) {
-      await user.click(cards[index]!)
-      await user.click(cards[index + 1]!)
+      fireEvent.click(cards[index]!)
+      fireEvent.click(cards[index + 1]!)
     }
 
     const nameInput = view.getByLabelText(/seu nome/i)
-    await user.clear(nameInput)
+    fireEvent.change(nameInput, { target: { value: '' } })
 
     const saveButton = view.getByRole('button', { name: /salvar pontuação/i })
     expect(saveButton).toBeDisabled()
   })
 
   it('deve salvar pontuação no ranking e fechar modal ao confirmar nome', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
     for (let index = 0; index < cards.length; index += 2) {
-      await user.click(cards[index]!)
-      await user.click(cards[index + 1]!)
+      fireEvent.click(cards[index]!)
+      fireEvent.click(cards[index + 1]!)
     }
 
     const nameInput = view.getByLabelText(/seu nome/i)
-    await user.clear(nameInput)
-    await user.type(nameInput, 'Jogador Teste')
-    await user.click(view.getByRole('button', { name: /salvar pontuação/i }))
+    fireEvent.change(nameInput, { target: { value: 'Jogador Teste' } })
+    fireEvent.click(view.getByRole('button', { name: /salvar pontuação/i }))
 
     expect(view.queryByRole('dialog', { name: /você venceu/i })).not.toBeInTheDocument()
     expect(view.getByRole('heading', { name: /você venceu/i })).toBeInTheDocument()
@@ -223,37 +260,35 @@ describe('Jogo da Memória - integração de UI', () => {
   })
 
   it('deve fechar modal sem salvar ao clicar em Pular', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
     for (let index = 0; index < cards.length; index += 2) {
-      await user.click(cards[index]!)
-      await user.click(cards[index + 1]!)
+      fireEvent.click(cards[index]!)
+      fireEvent.click(cards[index + 1]!)
     }
 
-    await user.click(view.getByRole('button', { name: /pular/i }))
+    fireEvent.click(view.getByRole('button', { name: /pular/i }))
     expect(view.queryByRole('dialog', { name: /você venceu/i })).not.toBeInTheDocument()
     expect(window.localStorage.getItem('memory-game.last-player-name')).toBeNull()
   })
 
   it('deve permitir abandonar a partida sem considerar pontuação no ranking', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const view = render(<App />)
 
-    await user.click(view.getByRole('button', { name: DIFFICULTIES.facil.label }))
-    await user.click(view.getByRole('button', { name: /iniciar partida/i }))
+    await startGameAndFinishInitialPreview(view)
 
     const cards = view.getAllByRole('button', { name: /carta/i })
-    await user.click(cards[0]!)
-    await user.click(cards[2]!)
+    fireEvent.click(cards[0]!)
+    fireEvent.click(cards[2]!)
 
     expect(view.getByText(/pontuação:/i)).toHaveTextContent('-15')
 
-    await user.click(view.getByRole('button', { name: /abandonar partida/i }))
+    fireEvent.click(view.getByRole('button', { name: /abandonar partida/i }))
 
     expect(view.getByRole('group', { name: /dificuldade/i })).toBeInTheDocument()
     expect(view.queryByText(/pontuação:/i)).not.toBeInTheDocument()

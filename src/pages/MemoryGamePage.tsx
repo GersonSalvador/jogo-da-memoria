@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { GameAnimation } from '../components/memory-game/GameAnimation.tsx'
 import { GameBoard } from '../components/memory-game/GameBoard.tsx'
 import { GameResult } from '../components/memory-game/GameResult.tsx'
@@ -95,6 +95,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
     remainingSeconds,
     score,
     isResolving,
+    isInitializingRound,
     showSaveModal,
     boardColumns,
     boardRows,
@@ -107,12 +108,16 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
     handlePlayAgain: handlePlayAgainBase,
     abandonGame,
     closeSaveModal,
+    showRoundPreview,
+    completeRoundInitialization,
   } = useMemoryGame()
 
   const { topOverall, lastPlayerName, saveEntry, getTopForDifficulty } = useLeaderboard()
   const { isAudioEnabled, audioEventSettings, playSound, toggleAudio, toggleSoundEvent } =
     useGameAudio()
   const [dealSequence, setDealSequence] = useState(0)
+  const dealSequenceRef = useRef(0)
+  const roundPreviewTimeoutRef = useRef<number | null>(null)
 
   const previousPhaseRef = useRef(phase)
   const previousIsResolvingRef = useRef(isResolving)
@@ -173,13 +178,55 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   }
 
   const handleStartGame = () => {
+    if (roundPreviewTimeoutRef.current !== null) {
+      window.clearTimeout(roundPreviewTimeoutRef.current)
+      roundPreviewTimeoutRef.current = null
+    }
+
     startGameBase()
-    setDealSequence((sequence) => sequence + 1)
+    const nextSequence = dealSequenceRef.current + 1
+    dealSequenceRef.current = nextSequence
+    setDealSequence(nextSequence)
 
     if (isAudioEnabled && audioEventSettings.gameStart) {
       playSound('gameStart', { startAtSeconds: 0.72 })
     }
   }
+
+  const handleDealAnimationComplete = useCallback(
+    (sequence: number) => {
+      if (phase !== 'playing' || !isInitializingRound || sequence !== dealSequenceRef.current) {
+        return
+      }
+
+      if (roundPreviewTimeoutRef.current !== null) {
+        window.clearTimeout(roundPreviewTimeoutRef.current)
+      }
+
+      showRoundPreview()
+
+      roundPreviewTimeoutRef.current = window.setTimeout(() => {
+        completeRoundInitialization()
+        roundPreviewTimeoutRef.current = null
+      }, 1000)
+    },
+    [completeRoundInitialization, isInitializingRound, phase, showRoundPreview],
+  )
+
+  useEffect(() => {
+    return () => {
+      if (roundPreviewTimeoutRef.current !== null) {
+        window.clearTimeout(roundPreviewTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if ((phase !== 'playing' || !isInitializingRound) && roundPreviewTimeoutRef.current !== null) {
+      window.clearTimeout(roundPreviewTimeoutRef.current)
+      roundPreviewTimeoutRef.current = null
+    }
+  }, [isInitializingRound, phase])
 
   const handleCardClick = (cardId: string) => {
     const faceUpUnmatchedCount = boardRows
@@ -352,7 +399,9 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
             cardPattern={cardPattern}
             phase={phase}
             isResolving={isResolving}
+            isInitializingRound={isInitializingRound}
             dealSequence={dealSequence}
+            onDealAnimationComplete={handleDealAnimationComplete}
             onCardClick={handleCardClick}
           />
           <GameResult phase={phase} score={score} onPlayAgain={handlePlayAgain} />

@@ -17,7 +17,16 @@ test.describe('Jogo da Memória', () => {
 
     await expect(page.getByText(/tempo restante:/i)).toContainText('270')
     await expect(page.getByRole('region', { name: /tabuleiro de cartas/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /carta/i }).first()).toBeVisible()
+    const firstCard = page.getByRole('button', { name: /carta/i }).first()
+    await expect(firstCard).toBeVisible()
+    await expect(firstCard).toBeDisabled()
+    await expect(firstCard).toHaveAttribute('data-flipped', 'false')
+
+    await expect(firstCard).toHaveAttribute('data-flipped', 'true', { timeout: 4_000 })
+    await expect(firstCard).toHaveAttribute('data-flipped', 'true')
+
+    await expect(firstCard).toBeEnabled({ timeout: 6_000 })
+    await expect(firstCard).toHaveAttribute('data-flipped', 'false')
     await expect(page.locator('[data-card-pattern="pontos"]').first()).toBeVisible()
   })
 

@@ -11,8 +11,35 @@ type GameBoardProps = {
   cardPattern: CardPatternKey
   phase: GamePhase
   isResolving: boolean
+  isInitializingRound: boolean
   dealSequence: number
+  onDealAnimationComplete: (sequence: number) => void
   onCardClick: (cardId: string) => void
+}
+
+const DEAL_ANIMATION_BASE_DELAY_MS = 720
+const DEAL_ANIMATION_CARD_DURATION_MS = 620
+const DEAL_ANIMATION_STAGGER_MS = 18
+const DEAL_ANIMATION_STAGGER_ROW_FACTOR = 8
+
+const calculateDealAnimationDuration = (boardRows: MemoryCard[][]): number => {
+  let maxStaggerIndex = 0
+
+  for (let rowIndex = 0; rowIndex < boardRows.length; rowIndex += 1) {
+    const row = boardRows[rowIndex]
+    for (let columnIndex = 0; columnIndex < row.length; columnIndex += 1) {
+      const staggerIndex = rowIndex * DEAL_ANIMATION_STAGGER_ROW_FACTOR + columnIndex
+      if (staggerIndex > maxStaggerIndex) {
+        maxStaggerIndex = staggerIndex
+      }
+    }
+  }
+
+  return (
+    DEAL_ANIMATION_BASE_DELAY_MS +
+    maxStaggerIndex * DEAL_ANIMATION_STAGGER_MS +
+    DEAL_ANIMATION_CARD_DURATION_MS
+  )
 }
 
 const calculateBoardMaxWidth = (totalCards: number, columns: number): number => {
@@ -37,7 +64,9 @@ export const GameBoard = ({
   cardPattern,
   phase,
   isResolving,
+  isInitializingRound,
   dealSequence,
+  onDealAnimationComplete,
   onCardClick,
 }: GameBoardProps) => {
   const totalCards = boardRows.length * boardColumns
@@ -48,10 +77,18 @@ export const GameBoard = ({
   const orderedCardIds = useMemo(() => {
     return boardRows.flat().map((card) => card.id)
   }, [layoutSignature])
+  const dealDurationMs = useMemo(() => {
+    return calculateDealAnimationDuration(boardRows)
+  }, [layoutSignature])
   const boardRef = useRef<HTMLElement | null>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const onDealAnimationCompleteRef = useRef(onDealAnimationComplete)
   const [cardOffsets, setCardOffsets] = useState<Record<string, { x: number; y: number }>>({})
   const [isDealing, setIsDealing] = useState(false)
+
+  useEffect(() => {
+    onDealAnimationCompleteRef.current = onDealAnimationComplete
+  }, [onDealAnimationComplete])
 
   useEffect(() => {
     if (phase !== 'playing') {
@@ -68,6 +105,7 @@ export const GameBoard = ({
     if (prefersReducedMotion) {
       setIsDealing(false)
       setCardOffsets({})
+      onDealAnimationCompleteRef.current(dealSequence)
       return
     }
 
@@ -102,10 +140,16 @@ export const GameBoard = ({
       setIsDealing(true)
     })
 
+    const timeoutId = window.setTimeout(() => {
+      setIsDealing(false)
+      onDealAnimationCompleteRef.current(dealSequence)
+    }, dealDurationMs)
+
     return () => {
       window.cancelAnimationFrame(rafId)
+      window.clearTimeout(timeoutId)
     }
-  }, [dealSequence, orderedCardIds, phase])
+  }, [dealDurationMs, dealSequence, orderedCardIds, phase])
 
   return (
     <section
@@ -143,7 +187,13 @@ export const GameBoard = ({
               <GameCard
                 card={card}
                 cardPattern={cardPattern}
-                isDisabled={phase !== 'playing' || card.isMatched || card.isFaceUp || isResolving}
+                isDisabled={
+                  phase !== 'playing' ||
+                  card.isMatched ||
+                  card.isFaceUp ||
+                  isResolving ||
+                  isInitializingRound
+                }
                 onClick={onCardClick}
               />
             </div>
