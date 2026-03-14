@@ -8,9 +8,7 @@ const { resolveSoundUrlMock } = vi.hoisted(() => ({
 }))
 
 vi.mock('../services/freesound.ts', async () => {
-  const actual = await vi.importActual<typeof import('../services/freesound.ts')>(
-    '../services/freesound.ts',
-  )
+  const actual = (await vi.importActual('../services/freesound.ts')) as Record<string, unknown>
 
   return {
     ...actual,
