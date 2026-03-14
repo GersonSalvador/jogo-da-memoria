@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  ALL_SOUND_EVENTS,
   CONFIGURABLE_SOUND_EVENTS,
   type GameSoundEvent,
   getSoundCooldownMs,
@@ -72,7 +73,11 @@ export const useGameAudio = () => {
     getInitialAudioEventSettings,
   )
   const audioElementsRef = useRef<Partial<Record<GameSoundEvent, HTMLAudioElement>>>({})
+  const audioPreloadPromisesRef = useRef<
+    Partial<Record<GameSoundEvent, Promise<HTMLAudioElement | null>>>
+  >({})
   const lastPlayedAtRef = useRef<Partial<Record<GameSoundEvent, number>>>({})
+  const isUnmountedRef = useRef(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -94,7 +99,10 @@ export const useGameAudio = () => {
   }, [audioEventSettings])
 
   useEffect(() => {
+    isUnmountedRef.current = false
+
     return () => {
+      isUnmountedRef.current = true
       const audioEntries = Object.values(audioElementsRef.current)
       for (const element of audioEntries) {
         if (!element) {
@@ -104,8 +112,62 @@ export const useGameAudio = () => {
         element.src = ''
       }
       audioElementsRef.current = {}
+      audioPreloadPromisesRef.current = {}
     }
   }, [])
+
+  const preloadSound = useMemo(() => {
+    return (event: GameSoundEvent): Promise<HTMLAudioElement | null> => {
+      if (typeof Audio === 'undefined') {
+        return Promise.resolve(null)
+      }
+
+      const cachedAudio = audioElementsRef.current[event]
+      if (cachedAudio) {
+        return Promise.resolve(cachedAudio)
+      }
+
+      const inFlightPreload = audioPreloadPromisesRef.current[event]
+      if (inFlightPreload) {
+        return inFlightPreload
+      }
+
+      const preloadPromise = (async () => {
+        const audioSource = await resolveSoundUrl(event)
+        if (isUnmountedRef.current) {
+          return null
+        }
+
+        let audio = audioElementsRef.current[event]
+
+        if (!audio) {
+          audio = new Audio(audioSource)
+          audio.preload = 'auto'
+          audioElementsRef.current[event] = audio
+        } else if (audio.src !== audioSource) {
+          audio.src = audioSource
+        }
+
+        audio.volume = getSoundVolume(event)
+        audio.load()
+
+        return audio
+      })()
+
+      audioPreloadPromisesRef.current[event] = preloadPromise
+      void preloadPromise.finally(() => {
+        if (audioPreloadPromisesRef.current[event] === preloadPromise) {
+          delete audioPreloadPromisesRef.current[event]
+        }
+      })
+
+      return preloadPromise
+    }
+  }, [])
+
+  useEffect(() => {
+    void Promise.allSettled(ALL_SOUND_EVENTS.map((event) => preloadSound(event)))
+  }, [preloadSound])
 
   const playSound = useMemo(() => {
     return (event: GameSoundEvent, options?: PlaySoundOptions) => {
@@ -124,15 +186,10 @@ export const useGameAudio = () => {
       lastPlayedAtRef.current[event] = now
 
       void (async () => {
-        const audioSource = await resolveSoundUrl(event)
-        let audio = audioElementsRef.current[event]
+        const audio = await preloadSound(event)
 
-        if (!audio) {
-          audio = new Audio(audioSource)
-          audio.preload = 'auto'
-          audioElementsRef.current[event] = audio
-        } else if (audio.src !== audioSource) {
-          audio.src = audioSource
+        if (!audio || isUnmountedRef.current) {
+          return
         }
 
         audio.volume = getSoundVolume(event)
@@ -150,7 +207,7 @@ export const useGameAudio = () => {
         }
       })()
     }
-  }, [audioEventSettings, isAudioEnabled])
+  }, [audioEventSettings, isAudioEnabled, preloadSound])
 
   const toggleAudio = () => {
     setIsAudioEnabled((isEnabled) => {

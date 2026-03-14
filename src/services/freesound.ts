@@ -9,6 +9,18 @@ export type GameSoundEvent =
   | 'buttonClick'
   | 'scoreHighlight'
 
+export const ALL_SOUND_EVENTS: GameSoundEvent[] = [
+  'gameStart',
+  'cardFlipUp',
+  'cardFlipDown',
+  'gameWon',
+  'gameLost',
+  'pairMatched',
+  'countdownTick',
+  'buttonClick',
+  'scoreHighlight',
+]
+
 export const CONFIGURABLE_SOUND_EVENTS: GameSoundEvent[] = [
   'gameStart',
   'cardFlipUp',
