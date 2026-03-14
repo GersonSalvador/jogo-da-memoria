@@ -38,7 +38,8 @@ function runConfetti(canvas: HTMLCanvasElement): () => void {
     y: -20 - Math.random() * 340,
     vx: (Math.random() - 0.5) * 4.5,
     vy: 2.5 + Math.random() * 5,
-    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    color:
+      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] ?? CONFETTI_COLORS[0],
     w: 8 + Math.random() * 10,
     h: 4 + Math.random() * 7,
     rot: Math.random() * Math.PI * 2,

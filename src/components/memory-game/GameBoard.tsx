@@ -27,6 +27,10 @@ const calculateDealAnimationDuration = (boardRows: MemoryCard[][]): number => {
 
   for (let rowIndex = 0; rowIndex < boardRows.length; rowIndex += 1) {
     const row = boardRows[rowIndex]
+    if (!row) {
+      continue
+    }
+
     for (let columnIndex = 0; columnIndex < row.length; columnIndex += 1) {
       const staggerIndex = rowIndex * DEAL_ANIMATION_STAGGER_ROW_FACTOR + columnIndex
       if (staggerIndex > maxStaggerIndex) {
