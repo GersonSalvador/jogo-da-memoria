@@ -176,6 +176,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   const handleSaveScore = (playerName: string) => {
     saveEntry({ playerName, score, difficulty, matchedPairs, errors, remainingSeconds })
     closeSaveModal()
+    playSound('scoreHighlight')
   }
 
   const handleStartGame = () => {

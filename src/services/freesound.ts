@@ -7,6 +7,7 @@ export type GameSoundEvent =
   | 'pairMatched'
   | 'countdownTick'
   | 'buttonClick'
+  | 'scoreHighlight'
 
 export const CONFIGURABLE_SOUND_EVENTS: GameSoundEvent[] = [
   'gameStart',
@@ -16,6 +17,7 @@ export const CONFIGURABLE_SOUND_EVENTS: GameSoundEvent[] = [
   'countdownTick',
   'gameWon',
   'gameLost',
+  'scoreHighlight',
 ]
 
 export const SOUND_EVENT_LABELS: Record<GameSoundEvent, string> = {
@@ -27,6 +29,7 @@ export const SOUND_EVENT_LABELS: Record<GameSoundEvent, string> = {
   gameWon: 'Vitória',
   gameLost: 'Derrota',
   buttonClick: 'Clique em botão',
+  scoreHighlight: 'Destaque de pontuação',
 }
 
 type SoundDescriptor = {
@@ -100,6 +103,12 @@ const SOUND_LIBRARY: Record<GameSoundEvent, SoundDescriptor> = {
     fallbackFormat: 'mp3',
     volume: 0.35,
     cooldownMs: 80,
+  },
+  scoreHighlight: {
+    id: 745362,
+    ownerId: 11206618,
+    fallbackFormat: 'mp3',
+    volume: 0.55,
   },
 }
 

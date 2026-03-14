@@ -19,6 +19,7 @@ const DEFAULT_EVENT_SETTINGS: Record<GameSoundEvent, boolean> = {
   pairMatched: true,
   countdownTick: true,
   buttonClick: false,
+  scoreHighlight: true,
 }
 
 type PlaySoundOptions = {
