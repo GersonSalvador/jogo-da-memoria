@@ -10,7 +10,13 @@ type MemoryCardProps = {
   onClick: (cardId: string) => void
 }
 
-export const MemoryCard = ({ card, cardPattern, isDimmed, isDisabled, onClick }: MemoryCardProps) => {
+export const MemoryCard = ({
+  card,
+  cardPattern,
+  isDimmed,
+  isDisabled,
+  onClick,
+}: MemoryCardProps) => {
   const isFlipped = card.isFaceUp || card.isMatched
 
   return (

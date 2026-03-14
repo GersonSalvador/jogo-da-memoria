@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { GamePhase } from '../../hooks/useMemoryGame.ts'
 import type { CardPatternKey } from '../../services/gameConfig.ts'
 import type { MemoryCard } from '../../services/memoryDeck.ts'
@@ -75,15 +75,8 @@ export const GameBoard = ({
 }: GameBoardProps) => {
   const totalCards = boardRows.length * boardColumns
   const boardMaxWidth = calculateBoardMaxWidth(totalCards, boardColumns)
-  const layoutSignature = boardRows
-    .map((row) => row.map((card) => card.id).join(','))
-    .join('|')
-  const orderedCardIds = useMemo(() => {
-    return boardRows.flat().map((card) => card.id)
-  }, [layoutSignature])
-  const dealDurationMs = useMemo(() => {
-    return calculateDealAnimationDuration(boardRows)
-  }, [layoutSignature])
+  const orderedCardIds = boardRows.flat().map((card) => card.id)
+  const dealDurationMs = calculateDealAnimationDuration(boardRows)
   const boardRef = useRef<HTMLElement | null>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const onDealAnimationCompleteRef = useRef(onDealAnimationComplete)
@@ -95,22 +88,36 @@ export const GameBoard = ({
   }, [onDealAnimationComplete])
 
   useEffect(() => {
-    if (phase !== 'playing') {
-      setIsDealing(false)
-      setCardOffsets({})
+    if (typeof window === 'undefined') {
       return
     }
 
-    if (typeof window === 'undefined') {
+    if (phase !== 'playing') {
+      const resetId = window.requestAnimationFrame(() => {
+        setIsDealing(false)
+        setCardOffsets({})
+      })
+
+      return () => {
+        window.cancelAnimationFrame(resetId)
+      }
+    }
+
+    if (orderedCardIds.length === 0) {
       return
     }
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
-      setIsDealing(false)
-      setCardOffsets({})
+      const resetId = window.requestAnimationFrame(() => {
+        setIsDealing(false)
+        setCardOffsets({})
+      })
       onDealAnimationCompleteRef.current(dealSequence)
-      return
+
+      return () => {
+        window.cancelAnimationFrame(resetId)
+      }
     }
 
     const rafId = window.requestAnimationFrame(() => {
