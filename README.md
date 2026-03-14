@@ -80,6 +80,13 @@ docs/                       Diretrizes e documentação de engenharia
 - Node.js 20.19 ou superior
 - npm 10 ou superior
 
+Se voce usa nvm, rode antes de instalar dependencias:
+
+```bash
+nvm install 20.19.0
+nvm use
+```
+
 ## Como rodar localmente
 
 ```bash
