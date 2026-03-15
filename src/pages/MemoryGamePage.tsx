@@ -113,7 +113,13 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
     completeRoundInitialization,
   } = useMemoryGame()
 
-  const { topOverall, lastPlayerName, saveEntry, getTopForDifficulty } = useLeaderboard()
+  const {
+    topOverall,
+    lastPlayerName,
+    saveEntry,
+    getTopForDifficulty,
+    isScoreEligibleForTopOverall,
+  } = useLeaderboard()
   const { isAudioEnabled, audioEventSettings, playSound, toggleAudio, toggleSoundEvent } =
     useGameAudio()
   const [dealSequence, setDealSequence] = useState(0)
@@ -174,9 +180,20 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   }, [phase, remainingSeconds, playSound])
 
   const handleSaveScore = (playerName: string) => {
-    saveEntry({ playerName, score, difficulty, matchedPairs, errors, remainingSeconds })
+    const reachedTopOverall = saveEntry({
+      playerName,
+      score,
+      difficulty,
+      matchedPairs,
+      errors,
+      remainingSeconds,
+    })
+
     closeSaveModal()
-    playSound('scoreHighlight')
+
+    if (reachedTopOverall) {
+      playSound('scoreHighlight')
+    }
   }
 
   const handleStartGame = () => {
@@ -256,6 +273,16 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
   const handleCloseSaveModal = () => {
     closeSaveModal()
   }
+
+  useEffect(() => {
+    if (phase !== 'won' || !showSaveModal) {
+      return
+    }
+
+    if (!isScoreEligibleForTopOverall(score)) {
+      closeSaveModal()
+    }
+  }, [closeSaveModal, isScoreEligibleForTopOverall, phase, score, showSaveModal])
 
   const handleThemeSelect = (themeKey: UiThemeKey) => {
     onSelectUiTheme(themeKey)
@@ -414,7 +441,7 @@ export const MemoryGamePage = ({ uiTheme, uiThemes, onSelectUiTheme }: MemoryGam
         </div>
       )}
 
-      {showSaveModal && (
+      {showSaveModal && isScoreEligibleForTopOverall(score) && (
         <SaveScoreModal
           lastPlayerName={lastPlayerName}
           score={score}

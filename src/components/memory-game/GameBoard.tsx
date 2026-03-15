@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import type { GamePhase } from '../../hooks/useMemoryGame.ts'
 import type { CardPatternKey } from '../../services/gameConfig.ts'
 import type { MemoryCard } from '../../services/memoryDeck.ts'
@@ -75,7 +75,21 @@ export const GameBoard = ({
 }: GameBoardProps) => {
   const totalCards = boardRows.length * boardColumns
   const boardMaxWidth = calculateBoardMaxWidth(totalCards, boardColumns)
-  const orderedCardIds = boardRows.flat().map((card) => card.id)
+  const orderedCardIdsSignature = useMemo(
+    () =>
+      boardRows
+        .flat()
+        .map((card) => card.id)
+        .join('|'),
+    [boardRows],
+  )
+  const orderedCardIds = useMemo(() => {
+    if (orderedCardIdsSignature.length === 0) {
+      return [] as string[]
+    }
+
+    return orderedCardIdsSignature.split('|')
+  }, [orderedCardIdsSignature])
   const dealDurationMs = calculateDealAnimationDuration(boardRows)
   const boardRef = useRef<HTMLElement | null>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})

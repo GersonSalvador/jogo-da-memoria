@@ -4,6 +4,7 @@ import { afterEach, beforeEach, vi } from 'vitest'
 import { DIFFICULTIES } from './services/gameConfig'
 import App from './App'
 import type { MemoryCard } from './services/memoryDeck.ts'
+import { TOP_N } from './types/leaderboard.ts'
 
 const INITIAL_DEAL_PHASE_MS = 2_200
 const INITIAL_ROUND_PREVIEW_TOTAL_MS = 5_000
@@ -166,6 +167,16 @@ describe('Jogo da Memória - integração de UI', () => {
 
     expect(firstCard).toBeEnabled()
     expect(firstCard).toHaveAttribute('data-flipped', 'false')
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1_000)
+    })
+
+    const remainingSecondsText = view.getByText(/tempo restante:/i).textContent ?? ''
+    const remainingSeconds = Number(remainingSecondsText.replace(/\D/g, ''))
+
+    expect(remainingSeconds).toBeLessThan(DIFFICULTIES.facil.timeLimitSeconds)
+    expect(remainingSeconds).toBeGreaterThan(0)
   })
 
   it('deve encerrar com derrota quando o tempo chegar a zero', async () => {
@@ -209,6 +220,38 @@ describe('Jogo da Memória - integração de UI', () => {
 
     expect(view.getByRole('dialog', { name: /você venceu/i })).toBeInTheDocument()
     expect(view.getByLabelText(/seu nome/i)).toBeInTheDocument()
+  })
+
+  it('não deve solicitar nome quando a pontuação final não entrar no top 10 geral', async () => {
+    const seedEntries = Array.from({ length: TOP_N }, (_, index) => ({
+      id: `seed-${index}`,
+      playerName: `Top ${index}`,
+      score: 1_000_000 - index,
+      difficulty: 'facil',
+      matchedPairs: 4,
+      errors: 0,
+      remainingSeconds: DIFFICULTIES.facil.timeLimitSeconds,
+      timestamp: 1_000 + index,
+    }))
+
+    window.localStorage.setItem(
+      'memory-game.leaderboard',
+      JSON.stringify({ entries: seedEntries, lastPlayerName: 'Top 0' }),
+    )
+
+    vi.useFakeTimers()
+    const view = render(<App />)
+
+    await startGameAndFinishInitialPreview(view)
+
+    const cards = view.getAllByRole('button', { name: /carta/i })
+    for (let index = 0; index < cards.length; index += 2) {
+      fireEvent.click(cards[index]!)
+      fireEvent.click(cards[index + 1]!)
+    }
+
+    expect(view.queryByRole('dialog', { name: /você venceu/i })).not.toBeInTheDocument()
+    expect(view.queryByLabelText(/seu nome/i)).not.toBeInTheDocument()
   })
 
   it('deve pré-preencher o campo de nome com o último nome salvo', async () => {
